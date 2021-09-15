@@ -16,7 +16,7 @@ Está licenciada sobre a MIT.
 
 **Dependencias**
 
-O projeto tem dependencias de outras lib do projeto ACBr.Net
+O projeto tem dependencias de outras lib do projeto OpenAC .Net
 	
 - OpenAC.Net.Core (https://github.com/OpenAC-Net/OpenAC.Net.Core)
   Biblioteca com varios metodos de extensão utilizados pelas bibliotecas
