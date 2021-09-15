@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAC.Net.Sat", "OpenAC.Net.Sat\OpenAC.Net.Sat.csproj", "{EE443D74-27E7-4236-851E-5E31A8AB8E63}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAC.Net.Sat.Demo", "OpenAC.Net.Sat.Demo\OpenAC.Net.Sat.Demo.csproj", "{D0D31D3B-C7D4-45F3-B09F-618FF56A48B8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAC.Net.Sat.Extrato.FastReport.OpenSource", "OpenAC.Net.Sat.Extrato.FastReport.OpenSource\OpenAC.Net.Sat.Extrato.FastReport.OpenSource.csproj", "{7E78F7EB-71C8-4BA6-AD2A-80EE10EE2D99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAC.Net.Sat.Extrato.FastReport", "OpenAC.Net.Sat.Extrato.FastReport\OpenAC.Net.Sat.Extrato.FastReport.csproj", "{7660A32A-E629-4755-9639-B2D323B5543D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE443D74-27E7-4236-851E-5E31A8AB8E63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE443D74-27E7-4236-851E-5E31A8AB8E63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE443D74-27E7-4236-851E-5E31A8AB8E63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE443D74-27E7-4236-851E-5E31A8AB8E63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0D31D3B-C7D4-45F3-B09F-618FF56A48B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0D31D3B-C7D4-45F3-B09F-618FF56A48B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0D31D3B-C7D4-45F3-B09F-618FF56A48B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0D31D3B-C7D4-45F3-B09F-618FF56A48B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E78F7EB-71C8-4BA6-AD2A-80EE10EE2D99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E78F7EB-71C8-4BA6-AD2A-80EE10EE2D99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E78F7EB-71C8-4BA6-AD2A-80EE10EE2D99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E78F7EB-71C8-4BA6-AD2A-80EE10EE2D99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7660A32A-E629-4755-9639-B2D323B5543D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7660A32A-E629-4755-9639-B2D323B5543D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7660A32A-E629-4755-9639-B2D323B5543D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7660A32A-E629-4755-9639-B2D323B5543D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EB2820FA-FEE6-436D-A727-1449A92A60C8}
+	EndGlobalSection
+EndGlobal
