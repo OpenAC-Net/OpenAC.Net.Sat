@@ -36,7 +36,9 @@ using System.Reflection;
 using FastReport;
 using FastReport.Export.Html;
 using FastReport.Export.PdfSimple;
+using OpenAC.Net.Core;
 using OpenAC.Net.Core.Extensions;
+using OpenAC.Net.DFe.Core;
 using OpenAC.Net.DFe.Core.Common;
 
 namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
@@ -147,16 +149,18 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
                 {
                     case ExtratoLayOut.Completo:
                     case ExtratoLayOut.Resumido:
-                        ms = assembly.GetManifestResourceStream("ACBr.Net.Sat.Extrato.FastReport.OpenSource.Extrato.ExtratoSat.frx");
+                        ms = assembly.GetManifestResourceStream("OpenAC.Net.Sat.Extrato.FastReport.OpenSource.Extrato.ExtratoSat.frx");
                         break;
 
                     case ExtratoLayOut.Cancelamento:
-                        ms = assembly.GetManifestResourceStream("ACBr.Net.Sat.Extrato.FastReport.OpenSource.Extrato.ExtratoSatCancelamento.frx");
+                        ms = assembly.GetManifestResourceStream("OpenAC.Net.Sat.Extrato.FastReport.OpenSource.Extrato.ExtratoSatCancelamento.frx");
                         break;
 
                     default:
                         throw new ArgumentOutOfRangeException(nameof(tipo), tipo, null);
                 }
+
+                Guard.Against<OpenDFeException>(ms == null, "Não foi possivel carregar o relatorio para impressão.");
 
                 internalReport.Load(ms);
             }
