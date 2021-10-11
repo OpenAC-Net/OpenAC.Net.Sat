@@ -69,7 +69,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FastReport.OpenSource" Version="2021.4.3" />
+    <PackageReference Include="FastReport.OpenSource" Version="2021.4.6" />
     <PackageReference Include="FastReport.OpenSource.Export.PdfSimple" Version="2021.4.0" />
   </ItemGroup>
 

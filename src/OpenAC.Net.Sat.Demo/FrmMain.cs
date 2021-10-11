@@ -25,6 +25,7 @@ namespace OpenAC.Net.Sat.Demo
         private SatRede redeAtual;
         private readonly OpenConfig config;
         private OpenSat acbrSat;
+        private ExtratoFastOpen extrato;
         private OpenIntegrador acbrIntegrador;
 
         #endregion Fields
@@ -50,10 +51,8 @@ namespace OpenAC.Net.Sat.Demo
         private void Initialize()
         {
             acbrIntegrador = new OpenIntegrador();
-            acbrSat = new OpenSat
-            {
-                Extrato = new ExtratoFastReport()
-            };
+            acbrSat = new OpenSat();
+            extrato = new ExtratoFastOpen();
 
             cmbAmbiente.EnumDataSource<DFeTipoAmbiente>(DFeTipoAmbiente.Homologacao);
             cmbModeloSat.EnumDataSource<ModeloSat>(ModeloSat.StdCall);
@@ -245,14 +244,14 @@ namespace OpenAC.Net.Sat.Demo
                 pctLogo.Image?.Dispose();
                 pctLogo.Image = null;
 
-                acbrSat.Extrato.Logo?.Dispose();
-                acbrSat.Extrato.Logo = null;
+                extrato.Logo?.Dispose();
+                extrato.Logo = null;
             }
             else
             {
                 var imgBytes = Convert.FromBase64String(img);
                 pctLogo.Image = imgBytes.ToImage();
-                acbrSat.Extrato.Logo = pctLogo.Image;
+                extrato.Logo = pctLogo.Image;
             }
 
             chkPreview.Checked = config.Get("ExtratoPreview", false);
@@ -421,13 +420,13 @@ namespace OpenAC.Net.Sat.Demo
         private void imprimirExtratoVendaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (cfeAtual.IsNull()) return;
-            acbrSat.ImprimirExtrato(cfeAtual);
+            extrato.ImprimirExtrato(cfeAtual);
         }
 
         private void imprimirExtratoVendaResumidoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (cfeAtual.IsNull()) return;
-            acbrSat.ImprimirExtratoResumido(cfeAtual);
+            extrato.ImprimirExtratoResumido(cfeAtual);
         }
 
         private void carregarXMLToolStripMenuItem_Click(object sender, EventArgs e)
@@ -477,7 +476,7 @@ namespace OpenAC.Net.Sat.Demo
         private void imprimirExtratoCancelamentoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (cfeAtual.IsNull() || cfeCancAtual.IsNull()) return;
-            acbrSat.ImprimirExtratoCancelamento(cfeCancAtual, cfeAtual.InfCFe.Ide.TpAmb ?? DFeTipoAmbiente.Homologacao);
+            extrato.ImprimirExtratoCancelamento(cfeCancAtual, cfeAtual.InfCFe.Ide.TpAmb ?? DFeTipoAmbiente.Homologacao);
         }
 
         private void consultarStatusOperacionalToolStripMenuItem_Click(object sender, EventArgs e)
@@ -724,25 +723,25 @@ namespace OpenAC.Net.Sat.Demo
 
         private void chkPreview_CheckedChanged(object sender, EventArgs e)
         {
-            acbrSat.Extrato.MostrarPreview = chkPreview.Checked;
+            extrato.MostrarPreview = chkPreview.Checked;
         }
 
         private void chkSetup_CheckedChanged(object sender, EventArgs e)
         {
-            acbrSat.Extrato.MostrarSetup = chkSetup.Checked;
+            extrato.MostrarSetup = chkSetup.Checked;
         }
 
         private void nudEspacoFinal_ValueChanged(object sender, EventArgs e)
         {
-            ((ExtratoFastReport)acbrSat.Extrato).EspacoFinal = nudEspacoFinal.Value;
+            extrato.EspacoFinal = nudEspacoFinal.Value;
         }
 
         private void cmbFiltro_SelectedIndexChanged(object sender, EventArgs e)
         {
-            acbrSat.Extrato.Filtro = (FiltroDFeReport)cmbFiltro.SelectedItem;
+            extrato.Filtro = (FiltroDFeReport)cmbFiltro.SelectedItem;
 
-            txtExportacao.Enabled = acbrSat.Extrato.Filtro != FiltroDFeReport.Nenhum;
-            btnExportacao.Enabled = acbrSat.Extrato.Filtro != FiltroDFeReport.Nenhum;
+            txtExportacao.Enabled = extrato.Filtro != FiltroDFeReport.Nenhum;
+            btnExportacao.Enabled = extrato.Filtro != FiltroDFeReport.Nenhum;
         }
 
         #endregion ValueChanged
@@ -854,7 +853,7 @@ namespace OpenAC.Net.Sat.Demo
 
             var img = Image.FromFile(file);
             pctLogo.Image = img;
-            acbrSat.Extrato.Logo = img;
+            extrato.Logo = img;
         }
 
         private void limparLogoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -862,13 +861,13 @@ namespace OpenAC.Net.Sat.Demo
             pctLogo.Image?.Dispose();
             pctLogo.Image = null;
 
-            acbrSat.Extrato.Logo?.Dispose();
-            acbrSat.Extrato.Logo = null;
+            extrato.Logo?.Dispose();
+            extrato.Logo = null;
         }
 
         private void btnExportacao_Click(object sender, EventArgs e)
         {
-            var extensao = acbrSat.Extrato.Filtro == FiltroDFeReport.HTML ? ".html" : ".pdf";
+            var extensao = extrato.Filtro == FiltroDFeReport.HTML ? ".html" : ".pdf";
             var file = Helpers.SaveFile($"ExtratoSat", $"Extrato Sat (*{extensao}) | *{extensao}");
             txtExportacao.Text = file;
         }

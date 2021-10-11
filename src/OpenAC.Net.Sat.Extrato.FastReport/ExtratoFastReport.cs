@@ -181,19 +181,5 @@ namespace OpenAC.Net.Sat.Extrato.FastReport
         }
 
         #endregion Methods
-
-        #region Overrides
-
-        protected override void OnInitialize()
-        {
-            //
-        }
-
-        protected override void OnDisposing()
-        {
-            //
-        }
-
-        #endregion Overrides
     }
 }

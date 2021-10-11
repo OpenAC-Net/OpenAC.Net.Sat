@@ -76,8 +76,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OpenAC.Net.Core" Version="1.0.0" />
-    <PackageReference Include="OpenAC.Net.DFe.Core" Version="1.0.0" />
+    <PackageReference Include="OpenAC.Net.Core" Version="1.0.0.1" />
+    <PackageReference Include="OpenAC.Net.DFe.Core" Version="1.1.0" />
     <PackageReference Include="PropertyChanged.Fody" Version="3.4.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

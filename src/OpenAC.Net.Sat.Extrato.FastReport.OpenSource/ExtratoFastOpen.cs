@@ -1,12 +1,12 @@
 // ***********************************************************************
-// Assembly         : ACBr.Net.Sat.Extrato.FastReport
+// Assembly         : OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 // Author           : RFTD
 // Created          : 06-28-2016
 //
 // Last Modified By : RFTD
 // Last Modified On : 10-26-2018
 // ***********************************************************************
-// <copyright file="Class1.cs" company="ACBr.Net">
+// <copyright file="ExtratoFastOpen.cs" company="ACBr.Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Grupo ACBr.Net
 //
@@ -43,7 +43,7 @@ using OpenAC.Net.DFe.Core.Common;
 
 namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 {
-    public sealed class ExtratoFastReport : ExtratoSat
+    public sealed class ExtratoFastOpen : ExtratoSat
     {
         #region Fields
 
@@ -186,19 +186,5 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
         }
 
         #endregion Methods
-
-        #region Overrides
-
-        protected override void OnInitialize()
-        {
-            //
-        }
-
-        protected override void OnDisposing()
-        {
-            //
-        }
-
-        #endregion Overrides
     }
 }

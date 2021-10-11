@@ -1,12 +1,12 @@
 ﻿// ***********************************************************************
-// Assembly         : OpenAC.Net.Sat.Extrato.FastReport
+// Assembly         : OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 // Author           : RFTD
 // Created          : 06-28-2016
 //
 // Last Modified By : RFTD
 // Last Modified On : 10-26-2018
 // ***********************************************************************
-// <copyright file="ExtratoEventArgs.cs" company="OpenAC .Net">
+// <copyright file="Extensions.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2014 - 2021 Projeto OpenAC .Net
 //
@@ -29,36 +29,31 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System;
-
 namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 {
-    public class ExtratoEventArgs : EventArgs
+    public static class CodigoMPExtensions
     {
-        #region Constructors
-
-        public ExtratoEventArgs(ExtratoLayOut tipo)
+        public static string Descricao(this CodigoMP codigo)
         {
-            Tipo = tipo;
-            FilePath = string.Empty;
+            switch (codigo)
+            {
+                case CodigoMP.Dinheiro: return "Dinheiro";
+                case CodigoMP.Cheque: return "Cheque";
+                case CodigoMP.CartaodeCredito: return "Cartão de Crédito";
+                case CodigoMP.CartaodeDebito: return "Cartão de Débito";
+                case CodigoMP.CreditoLoja: return "Crédito Loja";
+                case CodigoMP.ValeAlimentacao: return "Vale Alimentação";
+                case CodigoMP.ValeRefeicao: return "Vale Refeição";
+                case CodigoMP.ValePresente: return "Vale Presente";
+                case CodigoMP.ValeCombustivel: return "Vale Combustível";
+                case CodigoMP.BoletoBancario: return "Boleto Bancário";
+                case CodigoMP.DepositoBancario: return "Depósito Bancário";
+                case CodigoMP.PIX: return "PIX";
+                case CodigoMP.TransferenciaBancaria: return "Transferência Bancária";
+                case CodigoMP.ProgramaFidelidade: return "Programa Fidelidade";
+                case CodigoMP.SemPagamento: return "Sem Pagamento";
+                default: return "Outros";
+            }
         }
-
-        #endregion Constructors
-
-        #region Propriedades
-
-        /// <summary>
-        /// Retorna o tipo de arquivo necessario.
-        /// </summary>
-        /// <value>The tipo.</value>
-        public ExtratoLayOut Tipo { get; internal set; }
-
-        /// <summary>
-        /// Define ou retorna o caminho para o arquivo do FastReport.
-        /// </summary>
-        /// <value>The file path.</value>
-        public string FilePath { get; set; }
-
-        #endregion Propriedades
     }
 }

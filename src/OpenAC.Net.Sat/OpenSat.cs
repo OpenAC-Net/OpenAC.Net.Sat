@@ -8,7 +8,7 @@
 // ***********************************************************************
 // <copyright file="OpenSat.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2016 Projeto OpenAC .Net
+//	     		    Copyright (c) 2014 - 2021 Projeto OpenAC .Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -158,24 +158,6 @@ namespace OpenAC.Net.Sat
             {
                 Guard.Against<OpenException>(Ativo, "Não é possível definir a propriedade com o componente ativo");
                 encoding = value;
-            }
-        }
-
-        /// <summary>
-        /// Define/retorna a classe responsável por imprimir o Extrato do Sat.
-        /// </summary>
-        /// <value>The extrato.</value>
-        [DefaultValue(null)]
-        [Category("Componentes OpenAC .Net")]
-        [TypeConverter(typeof(ReferenceConverter))]
-        public ExtratoSat Extrato
-        {
-            get => extrato;
-            set
-            {
-                extrato = value;
-                if (extrato != null && extrato.Parent != this)
-                    extrato.Parent = this;
             }
         }
 
@@ -728,40 +710,6 @@ namespace OpenAC.Net.Sat
             IniciaComando($"TrocarCodigoDeAtivacao({codigo}, {opcao}, {novoCodigo})");
             var ret = satLibrary.TrocarCodigoDeAtivacao(Sessao, codigo, opcao, novoCodigo, novoCodigo);
             return FinalizaComando<SatResposta>(ret);
-        }
-
-        /// <summary>
-        /// Imprime o extrato do Cfe.
-        /// </summary>
-        /// <param name="cfe">The cfe.</param>
-        public void ImprimirExtrato(CFe cfe)
-        {
-            Guard.Against<ArgumentNullException>(Extrato == null, "Componente de Impressão não definido !");
-
-            Extrato.ImprimirExtrato(cfe);
-        }
-
-        /// <summary>
-        /// Imprime o extrato resumido do CFe.
-        /// </summary>
-        /// <param name="cfe">The cfe.</param>
-        public void ImprimirExtratoResumido(CFe cfe)
-        {
-            Guard.Against<ArgumentNullException>(Extrato == null, "Componente de Impressão não definido !");
-
-            Extrato.ImprimirExtratoResumido(cfe);
-        }
-
-        /// <summary>
-        /// Imprimir o extrato de cancelamento do CFe.
-        /// </summary>
-        /// <param name="ambiente">The cfe.</param>
-        /// <param name="cFeCanc">The c fe canc.</param>
-        public void ImprimirExtratoCancelamento(CFeCanc cFeCanc, DFeTipoAmbiente ambiente)
-        {
-            Guard.Against<ArgumentNullException>(Extrato == null, "Componente de Impressão não definido !");
-
-            Extrato.ImprimirExtratoCancelamento(cFeCanc, ambiente);
         }
 
         /// <summary>

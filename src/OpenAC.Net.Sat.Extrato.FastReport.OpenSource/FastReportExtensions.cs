@@ -1,5 +1,5 @@
 ﻿// ***********************************************************************
-// Assembly         : ACBr.Net.NFSe.DANFSe.FastReport.OpenSource
+// Assembly         : OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 // Author           : Rafael Dias
 // Created          : 01-31-2016
 //

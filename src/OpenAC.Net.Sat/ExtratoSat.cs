@@ -30,25 +30,17 @@
 // ***********************************************************************
 
 using System;
-using System.Drawing;
 using System.Globalization;
 using OpenAC.Net.Core.Extensions;
 using OpenAC.Net.DFe.Core.Common;
 
 namespace OpenAC.Net.Sat
 {
-    public abstract class ExtratoSat : DFeReportClass<OpenSat>
+    public abstract class ExtratoSat : DFeReportClass<FiltroDFeReport>
     {
         #region Propriedades
 
         public ExtratoLayOut LayOut { get; set; }
-
-#if NETFULL
-        public Image Logo { get; set; }
-
-#else
-        public byte[] Logo { get; set; }
-#endif
 
         #endregion Propriedades
 
@@ -65,13 +57,6 @@ namespace OpenAC.Net.Sat
         public abstract void ImprimirExtratoResumido(CFe cfe);
 
         public abstract void ImprimirExtratoCancelamento(CFeCanc cFeCanc, DFeTipoAmbiente ambiente);
-
-        /// <inheritdoc />
-        protected override void ParentChanged(OpenSat oldParent, OpenSat newParent)
-        {
-            if (oldParent != null && oldParent.Extrato == this) oldParent.Extrato = null;
-            if (newParent != null && newParent.Extrato != this) newParent.Extrato = this;
-        }
 
         #endregion Methods
     }
