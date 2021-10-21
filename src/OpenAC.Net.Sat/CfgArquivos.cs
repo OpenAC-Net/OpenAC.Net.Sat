@@ -30,9 +30,9 @@
 // ***********************************************************************
 
 using System.ComponentModel;
+using System.IO;
 using System.Reflection;
 using OpenAC.Net.Core;
-using OpenAC.Net.Core.Extensions;
 
 namespace OpenAC.Net.Sat
 {
@@ -51,7 +51,7 @@ namespace OpenAC.Net.Sat
         {
             PrefixoArqCFe = @"AD";
             PrefixoArqCFeCanc = @"ADC";
-            var path = Assembly.GetExecutingAssembly().GetPath();
+            var path = Path.GetDirectoryName((Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly()).Location);
             PastaCFeVenda = $@"{path}\Vendas";
             PastaCFeCancelamento = $@"{path}\Cancelamentos";
             PastaEnvio = $@"{path}\Enviado";
