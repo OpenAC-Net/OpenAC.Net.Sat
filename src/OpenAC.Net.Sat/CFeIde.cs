@@ -77,7 +77,7 @@ namespace OpenAC.Net.Sat
         /// </summary>
         /// <value>The c nf.</value>
         [DFeElement(TipoCampo.Int, "cNF", Id = "B03", Min = 6, Max = 6, Ocorrencia = Ocorrencia.MaiorQueZero)]
-        public int CNf { get; set; }
+        public int cNF { get; set; }
 
         /// <summary>
         /// Gets or sets the modelo.

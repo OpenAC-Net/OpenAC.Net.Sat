@@ -420,13 +420,23 @@ namespace OpenAC.Net.Sat.Demo
         private void imprimirExtratoVendaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (cfeAtual.IsNull()) return;
+            if(extrato.Filtro != FiltroDFeReport.Nenhum && extrato.NomeArquivo.IsEmpty()) return;;
+
             extrato.ImprimirExtrato(cfeAtual);
+            
+            if(extrato.Filtro == FiltroDFeReport.Nenhum) return;
+            MessageBox.Show(this, @"Extrato impresso com sucesso !", @"S@T Demo");
         }
 
         private void imprimirExtratoVendaResumidoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (cfeAtual.IsNull()) return;
+            if(extrato.Filtro != FiltroDFeReport.Nenhum && extrato.NomeArquivo.IsEmpty()) return;;
+
             extrato.ImprimirExtratoResumido(cfeAtual);
+
+            if(extrato.Filtro == FiltroDFeReport.Nenhum) return;
+            MessageBox.Show(this, @"Extrato impresso com sucesso !", @"S@T Demo");
         }
 
         private void carregarXMLToolStripMenuItem_Click(object sender, EventArgs e)
@@ -742,6 +752,11 @@ namespace OpenAC.Net.Sat.Demo
 
             txtExportacao.Enabled = extrato.Filtro != FiltroDFeReport.Nenhum;
             btnExportacao.Enabled = extrato.Filtro != FiltroDFeReport.Nenhum;
+        }
+
+        private void txtExportacao_TextChanged(object sender, EventArgs e)
+        {
+            extrato.NomeArquivo = txtExportacao.Text;
         }
 
         #endregion ValueChanged

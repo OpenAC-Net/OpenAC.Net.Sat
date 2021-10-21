@@ -22,7 +22,7 @@ namespace OpenAC.Net.Sat.Demo
             using (var sfd = new SaveFileDialog())
             {
                 sfd.CheckPathExists = true;
-                sfd.CheckFileExists = true;
+                sfd.CheckFileExists = false;
                 sfd.Filter = filter;
                 sfd.FileName = filename;
 
