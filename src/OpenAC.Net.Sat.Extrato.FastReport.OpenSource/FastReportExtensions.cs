@@ -41,6 +41,9 @@ using FastReport.Utils;
 #if !NETFULL
 using OpenAC.Net.DFe.Core;
 #endif
+#if NET50WIN
+using System.Drawing.Imaging;
+#endif
 
 namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 {
@@ -56,7 +59,7 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 
         public static void PrintWithDialog(this Report report)
         {
-#if NETFULL
+#if NETFULL || NET50WIN
             using (var dlg = new PrintDialog())
             {
                 dlg.AllowSomePages = true;
@@ -83,7 +86,7 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 
         public static void Show(this Report report, PrinterSettings settings = null)
         {
-#if NETFULL
+#if NETFULL || NET50WIN
             var doc = report.PrepareDoc(settings);
             if (doc == null) return;
 

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net452;netstandard2.0;net5.0-windows</TargetFrameworks>
     <AssemblyName>OpenAC.Net.Sat.Extrato.FastReport.OpenSource</AssemblyName>
     <RootNamespace>OpenAC.Net.Sat.Extrato.FastReport.OpenSource</RootNamespace>
     <SignAssembly>true</SignAssembly>
@@ -35,6 +35,10 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net452'">
+    <DefineConstants>NET45;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0-windows'">
     <DefineConstants>NET45;NETFULL</DefineConstants>
   </PropertyGroup>
 

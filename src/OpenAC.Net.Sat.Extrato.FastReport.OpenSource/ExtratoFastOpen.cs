@@ -168,12 +168,8 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
             {
                 internalReport.Load(e.FilePath);
             }
-
-#if NETFULL
-            internalReport.SetParameterValue("Logo", Logo.ToByteArray());
-#else
+            
             internalReport.SetParameterValue("Logo", Logo);
-#endif
             internalReport.SetParameterValue("IsResumido", tipo == ExtratoLayOut.Resumido);
             internalReport.SetParameterValue("IsOneLine", DescricaoUmaLinha);
             internalReport.SetParameterValue("EspacoFinal", EspacoFinal);

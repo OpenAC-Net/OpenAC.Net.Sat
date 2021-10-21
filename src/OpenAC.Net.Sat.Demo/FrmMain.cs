@@ -243,15 +243,14 @@ namespace OpenAC.Net.Sat.Demo
             {
                 pctLogo.Image?.Dispose();
                 pctLogo.Image = null;
-
-                extrato.Logo?.Dispose();
+                
                 extrato.Logo = null;
             }
             else
             {
                 var imgBytes = Convert.FromBase64String(img);
                 pctLogo.Image = imgBytes.ToImage();
-                extrato.Logo = pctLogo.Image;
+                extrato.Logo = pctLogo.Image.ToByteArray();
             }
 
             chkPreview.Checked = config.Get("ExtratoPreview", false);
@@ -868,15 +867,13 @@ namespace OpenAC.Net.Sat.Demo
 
             var img = Image.FromFile(file);
             pctLogo.Image = img;
-            extrato.Logo = img;
+            extrato.Logo = img.ToByteArray();
         }
 
         private void limparLogoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             pctLogo.Image?.Dispose();
             pctLogo.Image = null;
-
-            extrato.Logo?.Dispose();
             extrato.Logo = null;
         }
 
