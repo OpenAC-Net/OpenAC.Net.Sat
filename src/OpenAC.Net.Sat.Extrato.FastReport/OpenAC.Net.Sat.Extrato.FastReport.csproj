@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Extensions.cs" />
     <Compile Include="ExtratoEventArgs.cs" />
+    <Compile Include="ExtratoFastReportExtensions.cs" />
     <Compile Include="ExtratoFastReport.cs">
       <SubType>OpenAC .Net</SubType>
     </Compile>

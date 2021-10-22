@@ -1,12 +1,12 @@
 // ***********************************************************************
 // Assembly         : OpenAC.Net.Sat
 // Author           : RFTD
-// Created          : 03-31-2016
+// Created          : 21-10-2021
 //
 // Last Modified By : RFTD
-// Last Modified On : 02-16-2017
+// Last Modified On : 21-10-2021
 // ***********************************************************************
-// <copyright file="ExtratoSat.cs" company="OpenAC .Net">
+// <copyright file="IExtratoOptions.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -29,35 +29,37 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System;
-using System.Globalization;
-using OpenAC.Net.Core.Extensions;
+using System.Drawing;
 using OpenAC.Net.DFe.Core.Common;
 
 namespace OpenAC.Net.Sat
 {
-    public abstract class ExtratoSat : DFeReportClass<FiltroDFeReport>, IExtratoOptions
+    public interface IExtratoOptions
     {
-        #region Propriedades
+        ExtratoLayOut LayOut { get; set; }
 
-        public ExtratoLayOut LayOut { get; set; }
+#if NETFULL
+        Image Logo { get; set; }
+#else
+        byte[] Logo { get; set; }
+#endif
 
-        #endregion Propriedades
+        FiltroDFeReport Filtro { get; set; }
 
-        #region Methods
+        bool MostrarPreview { get; set; }
 
-        public string CalcularConteudoQRCode(string id, DateTime dhEmissao, decimal valor, string cpfcnpj, string assinaturaQrcode)
-        {
-            return $"{id}|{dhEmissao:yyyyMMddHHmmss}|{valor.ToString(CultureInfo.InvariantCulture)}" +
-                   $"|{cpfcnpj.OnlyNumbers()}|{assinaturaQrcode}";
-        }
+        bool MostrarSetup { get; set; }
 
-        public abstract void ImprimirExtrato(CFe cfe);
+        bool UsarPathPDF { get; set; }
 
-        public abstract void ImprimirExtratoResumido(CFe cfe);
+        string Impressora { get; set; }
 
-        public abstract void ImprimirExtratoCancelamento(CFeCanc cFeCanc, DFeTipoAmbiente ambiente);
+        int NumeroCopias { get; set; }
 
-        #endregion Methods
+        string NomeArquivo { get; set; }
+
+        string SoftwareHouse { get; set; }
+
+        string Site { get; set; }
     }
 }

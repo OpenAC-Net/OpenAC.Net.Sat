@@ -1,12 +1,12 @@
 // ***********************************************************************
 // Assembly         : OpenAC.Net.Sat
 // Author           : RFTD
-// Created          : 03-31-2016
+// Created          : 21-10-2021
 //
 // Last Modified By : RFTD
-// Last Modified On : 02-16-2017
+// Last Modified On : 21-10-2021
 // ***********************************************************************
-// <copyright file="ExtratoSat.cs" company="OpenAC .Net">
+// <copyright file="ExtratoFastOpenExtensions.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -30,34 +30,31 @@
 // ***********************************************************************
 
 using System;
-using System.Globalization;
-using OpenAC.Net.Core.Extensions;
 using OpenAC.Net.DFe.Core.Common;
 
-namespace OpenAC.Net.Sat
+namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 {
-    public abstract class ExtratoSat : DFeReportClass<FiltroDFeReport>, IExtratoOptions
+    public static class ExtratoFastOpenExtensions
     {
-        #region Propriedades
-
-        public ExtratoLayOut LayOut { get; set; }
-
-        #endregion Propriedades
-
-        #region Methods
-
-        public string CalcularConteudoQRCode(string id, DateTime dhEmissao, decimal valor, string cpfcnpj, string assinaturaQrcode)
+        public static void ImprimirExtrato(this OpenSat sat, CFe cfe, Action<IExtratoOptions> options = null)
         {
-            return $"{id}|{dhEmissao:yyyyMMddHHmmss}|{valor.ToString(CultureInfo.InvariantCulture)}" +
-                   $"|{cpfcnpj.OnlyNumbers()}|{assinaturaQrcode}";
+            var extrato = new ExtratoFastOpen();
+            options?.Invoke(extrato);
+            extrato.ImprimirExtrato(cfe);
         }
 
-        public abstract void ImprimirExtrato(CFe cfe);
+        public static void ImprimirExtratoCancelamento(this OpenSat sat, CFeCanc cFeCanc, DFeTipoAmbiente ambiente, Action<IExtratoOptions> options = null)
+        {
+            var extrato = new ExtratoFastOpen();
+            options?.Invoke(extrato);
+            extrato.ImprimirExtratoCancelamento(cFeCanc, ambiente);
+        }
 
-        public abstract void ImprimirExtratoResumido(CFe cfe);
-
-        public abstract void ImprimirExtratoCancelamento(CFeCanc cFeCanc, DFeTipoAmbiente ambiente);
-
-        #endregion Methods
+        public static void ImprimirExtratoResumido(this OpenSat sat, CFe cfe, Action<IExtratoOptions> options = null)
+        {
+            var extrato = new ExtratoFastOpen();
+            options?.Invoke(extrato);
+            extrato.ImprimirExtratoResumido(cfe);
+        }
     }
 }

@@ -94,7 +94,7 @@ namespace OpenAC.Net.Sat.Demo
             config.AddTarget("infoFile", infoTarget);
             config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, infoTarget));
             LogManager.Configuration = config;
-            logger = LogManager.GetLogger("ACBrSAT");
+            logger = LogManager.GetLogger("OpenSAT");
         }
 
         private void GerarCFe()
@@ -116,7 +116,7 @@ namespace OpenAC.Net.Sat.Demo
             {
                 var det = cfeAtual.InfCFe.Det.AddNew();
                 det.NItem = 1 + i;
-                det.Prod.CProd = $"ACBR{det.NItem:000}";
+                det.Prod.CProd = $"OPENAC{det.NItem:000}";
                 det.Prod.CEAN = "6291041500213";
                 det.Prod.XProd = "Assinatura SAC";
                 det.Prod.NCM = "99";
