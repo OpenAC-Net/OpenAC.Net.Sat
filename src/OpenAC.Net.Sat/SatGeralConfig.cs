@@ -1,12 +1,12 @@
 ﻿// ***********************************************************************
 // Assembly         : OpenAC.Net.Sat
 // Author           : RFTD
-// Created          : 03-31-2016
+// Created          : 31-03-2016
 //
 // Last Modified By : RFTD
-// Last Modified On : 03-31-2016
+// Last Modified On : 23-10-2021
 // ***********************************************************************
-// <copyright file="SATConfig.cs" company="OpenAC .Net">
+// <copyright file="SatGeralConfig.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -29,26 +29,22 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.ComponentModel;
-using OpenAC.Net.Core;
 using OpenAC.Net.DFe.Core.Common;
 
 namespace OpenAC.Net.Sat
 {
     /// <summary>
-    /// Class SATConfig. This class cannot be inherited.
+    /// Classe com as configurações do SAT.
     /// </summary>
-    [TypeConverter(typeof(OpenExpandableObjectConverter))]
-    public sealed class SatConfig
+    public sealed class SatGeralConfig
     {
         #region Constructor
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SatConfig"/> class.
+        /// Initializes a new instance of the <see cref="SatGeralConfig"/> class.
         /// </summary>
-        internal SatConfig(OpenSat parent)
+        public SatGeralConfig()
         {
-            Parent = parent;
             InfCFeVersaoDadosEnt = 0.07M;
             IdeCNPJ = @"11111111111111";
             IdeNumeroCaixa = 1;
@@ -67,9 +63,7 @@ namespace OpenAC.Net.Sat
         #endregion Constructor
 
         #region Propriedades
-
-        internal OpenSat Parent { get; }
-
+        
         public decimal InfCFeVersaoDadosEnt { get; set; }
 
         public string IdeCNPJ { get; set; }

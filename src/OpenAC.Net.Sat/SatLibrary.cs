@@ -41,7 +41,7 @@ namespace OpenAC.Net.Sat
     {
         #region Constructors
 
-        protected SatLibrary(SatConfig config, string pathDll, Encoding encoding) : base(pathDll)
+        protected SatLibrary(SatGeralConfig config, string pathDll, Encoding encoding) : base(pathDll)
         {
             PathDll = pathDll;
             Encoding = encoding;
@@ -58,7 +58,7 @@ namespace OpenAC.Net.Sat
 
         public string ModeloStr { get; protected set; }
 
-        public SatConfig Config { get; protected set; }
+        public SatGeralConfig Config { get; protected set; }
 
         #endregion Propriedades
 

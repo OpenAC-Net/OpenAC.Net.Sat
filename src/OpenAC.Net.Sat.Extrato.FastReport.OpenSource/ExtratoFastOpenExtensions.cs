@@ -47,7 +47,7 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
         {
             var extrato = new ExtratoFastOpen();
             options?.Invoke(extrato);
-            extrato.ImprimirExtratoCancelamento(cFeCanc, ambiente);
+            extrato.ImprimirExtratoCancelamento(cFeCanc, ambiente);            
         }
 
         public static void ImprimirExtratoResumido(this OpenSat sat, CFe cfe, Action<IExtratoOptions> options = null)

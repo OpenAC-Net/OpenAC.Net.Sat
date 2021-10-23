@@ -1,12 +1,12 @@
 // ***********************************************************************
 // Assembly         : OpenAC.Net.Sat
 // Author           : RFTD
-// Created          : 03-31-2016
+// Created          : 31-03-2016
 //
 // Last Modified By : RFTD
-// Last Modified On : 02-16-2017
+// Last Modified On : 23-10-2021
 // ***********************************************************************
-// <copyright file="CfgArquivos.cs" company="OpenAC .Net">
+// <copyright file="SatArquivoConfig.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -29,25 +29,22 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.ComponentModel;
 using System.IO;
 using System.Reflection;
-using OpenAC.Net.Core;
 
 namespace OpenAC.Net.Sat
 {
     /// <summary>
     /// Classe de configuração de salvamento dos arquivos da NFe
     /// </summary>
-    [TypeConverter(typeof(OpenExpandableObjectConverter))]
-    public sealed class CfgArquivos
+    public sealed class SatArquivoConfig
     {
         #region Constructor
 
         /// <summary>
-        /// Inicializa uma nova instancia da classe <see cref="CfgArquivos" />.
+        /// Inicializa uma nova instancia da classe <see cref="SatArquivoConfig" />.
         /// </summary>
-        internal CfgArquivos()
+        public SatArquivoConfig()
         {
             PrefixoArqCFe = @"AD";
             PrefixoArqCFeCanc = @"ADC";

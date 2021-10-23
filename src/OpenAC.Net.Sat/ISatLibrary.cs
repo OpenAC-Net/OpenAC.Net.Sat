@@ -34,11 +34,14 @@ using System.Text;
 
 namespace OpenAC.Net.Sat
 {
+    /// <summary>
+    /// Interface para padronizar a comunicação com as bibliotecas do SAT.
+    /// </summary>
     public interface ISatLibrary : IDisposable
     {
         #region Properties
 
-        SatConfig Config { get; }
+        SatGeralConfig Config { get; }
 
         Encoding Encoding { get; }
 

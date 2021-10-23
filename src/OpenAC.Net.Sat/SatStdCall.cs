@@ -139,7 +139,7 @@ namespace OpenAC.Net.Sat
 
         #region Constructors
 
-        public SatStdCall(SatConfig config, string pathDll, Encoding encoding) : base(config, pathDll, encoding)
+        public SatStdCall(SatGeralConfig config, string pathDll, Encoding encoding) : base(config, pathDll, encoding)
         {
             ModeloStr = "StdCall";
 

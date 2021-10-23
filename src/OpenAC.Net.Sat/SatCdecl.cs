@@ -139,7 +139,7 @@ namespace OpenAC.Net.Sat
 
         #region Constructors
 
-        public SatCdecl(SatConfig config, string pathDll, Encoding encoding) : base(config, pathDll, encoding)
+        public SatCdecl(SatGeralConfig config, string pathDll, Encoding encoding) : base(config, pathDll, encoding)
         {
             ModeloStr = "Cdecl";
 

@@ -39,7 +39,7 @@ namespace OpenAC.Net.Sat
     /// </summary>
     public static class SatManager
     {
-        public static ISatLibrary GetLibrary(ModeloSat modelo, SatConfig config, string pathDll, Encoding encoding)
+        public static ISatLibrary GetLibrary(ModeloSat modelo, SatGeralConfig config, string pathDll, Encoding encoding)
         {
             switch (modelo)
             {

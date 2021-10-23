@@ -1,10 +1,10 @@
 ﻿// ***********************************************************************
 // Assembly         : OpenAC.Net.Sat
 // Author           : RFTD
-// Created          : 03-29-2016
+// Created          : 29-03-2016
 //
 // Last Modified By : RFTD
-// Last Modified On : 02-16-2017
+// Last Modified On : 23-10-2021
 // ***********************************************************************
 // <copyright file="OpenSat.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
@@ -30,7 +30,6 @@
 // ***********************************************************************
 
 using System;
-using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -38,6 +37,7 @@ using System.Text;
 using OpenAC.Net.Core;
 using OpenAC.Net.Core.Extensions;
 using OpenAC.Net.Core.Logging;
+using OpenAC.Net.DFe.Core;
 using OpenAC.Net.DFe.Core.Common;
 using OpenAC.Net.Sat.Events;
 
@@ -133,24 +133,19 @@ namespace OpenAC.Net.Sat
         /// Configurações do OpenSat
         /// </summary>
         /// <value>The configuracoes.</value>
-        [Category("Configurações")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public SatConfig Configuracoes { get; private set; }
+        public SatGeralConfig Configuracoes { get; private set; }
 
         /// <summary>
         /// Configurações de como OpenSat vai se comportar com os arquivos gerado e recebido.
         /// </summary>
         /// <value>The arquivos.</value>
-        [Category("Configurações")]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
-        public CfgArquivos Arquivos { get; private set; }
+        public SatArquivoConfig Arquivos { get; private set; }
 
         /// <summary>
         /// Enconding usado para tratar as string que são enviadas/recebidas.
         /// </summary>
         /// <value>O Enconder</value>
         /// <exception cref="Exception">Não é possível definir a propriedade com o componente ativo</exception>
-        [Browsable(false)]
         public Encoding Encoding
         {
             get => encoding;
@@ -165,7 +160,6 @@ namespace OpenAC.Net.Sat
         /// Define/retorna o modelo a ser utilizado pelo OpenSat.
         /// </summary>
         /// <value>The modelo.</value>
-        [Category("Configurações")]
         public ModeloSat Modelo
         {
             get => modelo;
@@ -180,14 +174,12 @@ namespace OpenAC.Net.Sat
         /// Retorna o indicador se o componente esta ativo ou não.
         /// </summary>
         /// <value><c>true</c> se está ativo; senão, <c>false</c>.</value>
-        [Browsable(false)]
         public bool Ativo { get; private set; }
 
         /// <summary>
         /// Retorna o indicador se o componente esta em aguardando uma resposta ou não.
         /// </summary>
         /// <value><c>true</c> se estiver aguardando uma resposta; senão, <c>false</c>.</value>
-        [Browsable(false)]
         public bool AguardandoResposta
         {
             get => aguardandoResposta;
@@ -204,14 +196,12 @@ namespace OpenAC.Net.Sat
         /// Retorna o número da sessão atual.
         /// </summary>
         /// <value>The sessao.</value>
-        [Browsable(false)]
         public int Sessao { get; private set; }
 
         /// <summary>
         /// Define/retorna o código usado para ativar o Sat
         /// </summary>
         /// <value>Código ativacao.</value>
-        [Category("Configurações")]
         public string CodigoAtivacao
         {
             get
@@ -228,7 +218,6 @@ namespace OpenAC.Net.Sat
         /// <summary>
         /// Define/retorna a assinatura de (CNPJ Software House + CNPJ Emitente) que gerou o CF-e </summary>
         /// <value>SignAC.</value>
-        [Category("Configurações")]
         public string SignAC
         {
             get
@@ -247,7 +236,6 @@ namespace OpenAC.Net.Sat
         /// Define/retorna o caminho onde se encontra a biblioteca do Sat.
         /// </summary>
         /// <value>O caminho da dll.</value>
-        [Category("Configurações")]
         public string PathDll
         {
             get => pathDll;
@@ -270,6 +258,8 @@ namespace OpenAC.Net.Sat
         /// <exception cref="NotImplementedException"></exception>
         public void Ativar()
         {
+            Guard.Against<OpenDFeException>(Ativo, "Componente já está ativo.");
+
             satLibrary = SatManager.GetLibrary(Modelo, Configuracoes, PathDll, Encoding);
             Ativo = true;
         }
@@ -279,6 +269,8 @@ namespace OpenAC.Net.Sat
         /// </summary>
         public void Desativar()
         {
+            Guard.Against<OpenDFeException>(!Ativo, "Componente não está ativo.");
+
             if (satLibrary != null)
             {
                 satLibrary.Dispose();
@@ -820,8 +812,8 @@ namespace OpenAC.Net.Sat
         /// <inheritdoc />
         protected override void OnInitialize()
         {
-            Configuracoes = new SatConfig(this);
-            Arquivos = new CfgArquivos();
+            Configuracoes = new SatGeralConfig();
+            Arquivos = new SatArquivoConfig();
             Encoding = Encoding.UTF8;
 
             PathDll = @"C:\SAT\SAT.dll";
@@ -832,10 +824,7 @@ namespace OpenAC.Net.Sat
         /// <inheritdoc />
         protected override void OnDisposing()
         {
-            if (Ativo)
-            {
-                Desativar();
-            }
+            if (Ativo) Desativar();
         }
 
         #endregion Override
