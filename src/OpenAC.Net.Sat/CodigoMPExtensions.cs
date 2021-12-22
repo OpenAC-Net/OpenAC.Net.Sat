@@ -1,12 +1,12 @@
-Ôªø// ***********************************************************************
-// Assembly         : OpenAC.Net.Sat.Extrato.FastReport.OpenSource
+// ***********************************************************************
+// Assembly         : OpenAC.Net.Sat
 // Author           : RFTD
 // Created          : 06-28-2016
 //
 // Last Modified By : RFTD
 // Last Modified On : 10-26-2018
 // ***********************************************************************
-// <copyright file="Extensions.cs" company="OpenAC .Net">
+// <copyright file="CodigoMPExtensions.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2014 - 2021 Projeto OpenAC .Net
 //
@@ -29,7 +29,7 @@
 // <summary></summary>
 // ***********************************************************************
 
-namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
+namespace OpenAC.Net.Sat
 {
     public static class CodigoMPExtensions
     {
@@ -39,17 +39,17 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
             {
                 case CodigoMP.Dinheiro: return "Dinheiro";
                 case CodigoMP.Cheque: return "Cheque";
-                case CodigoMP.CartaodeCredito: return "Cart√£o de Cr√©dito";
-                case CodigoMP.CartaodeDebito: return "Cart√£o de D√©bito";
-                case CodigoMP.CreditoLoja: return "Cr√©dito Loja";
-                case CodigoMP.ValeAlimentacao: return "Vale Alimenta√ß√£o";
-                case CodigoMP.ValeRefeicao: return "Vale Refei√ß√£o";
+                case CodigoMP.CartaodeCredito: return "Cart„o de CrÈdito";
+                case CodigoMP.CartaodeDebito: return "Cart„o de DÈbito";
+                case CodigoMP.CreditoLoja: return "CrÈdito Loja";
+                case CodigoMP.ValeAlimentacao: return "Vale AlimentaÁ„o";
+                case CodigoMP.ValeRefeicao: return "Vale RefeiÁ„o";
                 case CodigoMP.ValePresente: return "Vale Presente";
-                case CodigoMP.ValeCombustivel: return "Vale Combust√≠vel";
-                case CodigoMP.BoletoBancario: return "Boleto Banc√°rio";
-                case CodigoMP.DepositoBancario: return "Dep√≥sito Banc√°rio";
+                case CodigoMP.ValeCombustivel: return "Vale CombustÌvel";
+                case CodigoMP.BoletoBancario: return "Boleto Banc·rio";
+                case CodigoMP.DepositoBancario: return "DepÛsito Banc·rio";
                 case CodigoMP.PIX: return "PIX";
-                case CodigoMP.TransferenciaBancaria: return "Transfer√™ncia Banc√°ria";
+                case CodigoMP.TransferenciaBancaria: return "TransferÍncia Banc·ria";
                 case CodigoMP.ProgramaFidelidade: return "Programa Fidelidade";
                 case CodigoMP.SemPagamento: return "Sem Pagamento";
                 default: return "Outros";
