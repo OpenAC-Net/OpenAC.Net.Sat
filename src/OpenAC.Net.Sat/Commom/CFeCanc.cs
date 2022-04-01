@@ -32,6 +32,7 @@
 using OpenAC.Net.Core.Extensions;
 using OpenAC.Net.DFe.Core.Attributes;
 using OpenAC.Net.DFe.Core.Document;
+using OpenAC.Net.Sat.Commom;
 
 namespace OpenAC.Net.Sat
 {

@@ -19,6 +19,8 @@
 		using OpenAC.Net.Core.Extensions;
 		using OpenAC.Net.DFe.Core.Common;
 		using OpenAC.Net.Sat;
+		using OpenAC.Net.Sat.Commom;
+		using OpenAC.Net.Sat.Extensions;
 		using OpenAC.Net.Sat.Extrato.FastReport;
 
 		namespace FastReport

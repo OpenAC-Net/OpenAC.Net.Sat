@@ -31,8 +31,9 @@
 
 using System.Text;
 using OpenAC.Net.Core.InteropServices;
+using OpenAC.Net.Sat.Interfaces;
 
-namespace OpenAC.Net.Sat
+namespace OpenAC.Net.Sat.Library
 {
     /// <summary>
     /// Class SatLibrary.

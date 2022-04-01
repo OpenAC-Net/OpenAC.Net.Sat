@@ -32,7 +32,7 @@
 using System;
 using System.Text;
 
-namespace OpenAC.Net.Sat
+namespace OpenAC.Net.Sat.Interfaces
 {
     /// <summary>
     /// Interface para padronizar a comunicação com as bibliotecas do SAT.

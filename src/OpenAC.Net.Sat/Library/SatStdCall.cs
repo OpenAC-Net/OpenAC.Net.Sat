@@ -33,95 +33,95 @@ using System.Runtime.InteropServices;
 using System.Text;
 using OpenAC.Net.Core.InteropServices;
 
-namespace OpenAC.Net.Sat
+namespace OpenAC.Net.Sat.Library
 {
-    internal sealed class SatCdecl : SatLibrary
+    internal sealed class SatStdCall : SatLibrary
     {
         #region InnerTypes
 
         private class Delegates
         {
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string AssociarAssinatura(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao,
                 [MarshalAs(UnmanagedType.LPStr)] string cnpjValue,
                 [MarshalAs(UnmanagedType.LPStr)] string assinaturaCnpj);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string AtivarSAT(int numeroSessao, int subComando,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao,
                 [MarshalAs(UnmanagedType.LPStr)] string cnpj,
                 int cUF);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string AtualizarSoftwareSAT(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string BloquearSAT(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string CancelarUltimaVenda(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao,
                 [MarshalAs(UnmanagedType.LPStr)] string chave,
                 [MarshalAs(UnmanagedType.LPStr)] string dadosCancelamento);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string ComunicarCertificadoICPBRASIL(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao,
                 [MarshalAs(UnmanagedType.LPStr)] string certificado);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string ConfigurarInterfaceDeRede(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao,
                 [MarshalAs(UnmanagedType.LPStr)] string dadosConfiguracao);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string ConsultarNumeroSessao(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao,
                 int cNumeroDeSessao);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string ConsultarSAT(int numeroSessao);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string ConsultarStatusOperacional(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string DesbloquearSAT(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string EnviarDadosVenda(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao,
                 [MarshalAs(UnmanagedType.LPStr)] string dadosVenda);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string ExtrairLogs(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string TesteFimAFim(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao,
                 [MarshalAs(UnmanagedType.LPStr)] string dadosVenda);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string TrocarCodigoDeAtivacao(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao,
@@ -129,7 +129,7 @@ namespace OpenAC.Net.Sat
                 [MarshalAs(UnmanagedType.LPStr)] string novoCodigo,
                 [MarshalAs(UnmanagedType.LPStr)] string confNovoCodigo);
 
-            [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+            [UnmanagedFunctionPointer(CallingConvention.StdCall)]
             [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(OpenLPStr))]
             public delegate string ConsultarUltimaSessaoFiscal(int numeroSessao,
                 [MarshalAs(UnmanagedType.LPStr)] string codigoDeAtivacao);
@@ -139,9 +139,9 @@ namespace OpenAC.Net.Sat
 
         #region Constructors
 
-        public SatCdecl(SatGeralConfig config, string pathDll, Encoding encoding) : base(config, pathDll, encoding)
+        public SatStdCall(SatGeralConfig config, string pathDll, Encoding encoding) : base(config, pathDll, encoding)
         {
-            ModeloStr = "Cdecl";
+            ModeloStr = "StdCall";
 
             AddMethod<Delegates.AssociarAssinatura>("AssociarAssinatura");
             AddMethod<Delegates.AtivarSAT>("AtivarSAT");
@@ -163,7 +163,7 @@ namespace OpenAC.Net.Sat
 
         #endregion Constructors
 
-        #region Method
+        #region Methods
 
         public override string AssociarAssinatura(int numeroSessao, string codigoAtivacao, string cnpjValue, string assinaturacnpj)
         {
@@ -189,20 +189,23 @@ namespace OpenAC.Net.Sat
             return ExecuteMethod(() => funcaoSat(numeroSessao, ToEncoding(codigoDeAtivacao)));
         }
 
-        public override string CancelarUltimaVenda(int numeroSessao, string codigoDeAtivacao, string chave, string dadosCancelamento)
+        public override string CancelarUltimaVenda(int numeroSessao, string codigoDeAtivacao, string chave,
+            string dadosCancelamento)
         {
             var funcaoSat = GetMethod<Delegates.CancelarUltimaVenda>();
             return ExecuteMethod(() => funcaoSat(numeroSessao, ToEncoding(codigoDeAtivacao), ToEncoding(chave),
                 ToEncoding(dadosCancelamento)));
         }
 
-        public override string ComunicarCertificadoIcpBrasil(int numeroSessao, string codigoDeAtivacao, string certificado)
+        public override string ComunicarCertificadoIcpBrasil(int numeroSessao, string codigoDeAtivacao,
+            string certificado)
         {
             var funcaoSat = GetMethod<Delegates.ComunicarCertificadoICPBRASIL>();
             return ExecuteMethod(() => funcaoSat(numeroSessao, ToEncoding(codigoDeAtivacao), ToEncoding(certificado)));
         }
 
-        public override string ConfigurarInterfaceDeRede(int numeroSessao, string codigoDeAtivacao, string dadosConfiguracao)
+        public override string ConfigurarInterfaceDeRede(int numeroSessao, string codigoDeAtivacao,
+            string dadosConfiguracao)
         {
             var funcaoSat = GetMethod<Delegates.ConfigurarInterfaceDeRede>();
             return ExecuteMethod(() => funcaoSat(numeroSessao, ToEncoding(codigoDeAtivacao), ToEncoding(dadosConfiguracao)));
@@ -256,13 +259,14 @@ namespace OpenAC.Net.Sat
             return ExecuteMethod(() => funcaoSat(numeroSessao, codigoDeAtivacao, ToEncoding(dadosVenda)));
         }
 
-        public override string TrocarCodigoDeAtivacao(int numeroSessao, string codigoDeAtivacao, int opcao, string novoCodigo, string confNovoCodigo)
+        public override string TrocarCodigoDeAtivacao(int numeroSessao, string codigoDeAtivacao, int opcao,
+            string novoCodigo, string confNovoCodigo)
         {
             var funcaoSat = GetMethod<Delegates.TrocarCodigoDeAtivacao>();
             return ExecuteMethod(() => funcaoSat(numeroSessao, ToEncoding(codigoDeAtivacao), opcao, ToEncoding(novoCodigo),
                 ToEncoding(confNovoCodigo)));
         }
 
-        #endregion Method
+        #endregion Methods
     }
 }

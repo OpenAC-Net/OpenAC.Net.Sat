@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net452;netstandard2.0;net5.0-windows</TargetFrameworks>
+    <TargetFrameworks>net452;net5.0-windows;net6.0-windows</TargetFrameworks>
     <AssemblyName>OpenAC.Net.Sat.Extrato.FastReport.OpenSource</AssemblyName>
     <RootNamespace>OpenAC.Net.Sat.Extrato.FastReport.OpenSource</RootNamespace>
     <SignAssembly>true</SignAssembly>
@@ -18,9 +18,9 @@
     <Description>Biblioteca para utilização do SAT/MFe</Description>
     <NeutralLanguage>pt-BR</NeutralLanguage>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.0.0.1</FileVersion>
-    <Version>1.0.0.1</Version>
+    <AssemblyVersion>1.5.0.0</AssemblyVersion>
+    <FileVersion>1.5.0.0</FileVersion>
+    <Version>1.5.0.0-preview.1</Version>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <DebugType>embedded</DebugType>
@@ -30,74 +30,47 @@
     <PackageId>OpenAC.Net.Sat.Extrato.FastReport.OpenSource</PackageId>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
-    <DefineConstants>NETCORE;NETSTANDARD;NETSTANDARD2_0</DefineConstants>
-  </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net452'">
-    <DefineConstants>NET45;NETFULL</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup>
+		<DefineConstants>NET45;NETFULL</DefineConstants>
+	</PropertyGroup>
 
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5.0-windows'">
-    <DefineConstants>NET45;NETFULL</DefineConstants>
-  </PropertyGroup>
+	<ItemGroup>
+		<None Remove="Extrato\ExtratoSat.frx" />
+		<None Remove="Extrato\ExtratoSatCancelamento.frx" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net452|AnyCPU'">
-    <OutputPath>..\..\bin\Debug\</OutputPath>
-    <DocumentationFile>..\..\bin\Debug\net452\OpenAC.Net.Sat.Extrato.FastReport.OpenSource.xml</DocumentationFile>
-  </PropertyGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Extrato\ExtratoSat.frx" />
+		<EmbeddedResource Include="Extrato\ExtratoSatCancelamento.frx" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net452|AnyCPU'">
-    <OutputPath>..\..\bin\Release\</OutputPath>
-    <DocumentationFile>..\..\bin\Release\net452\OpenAC.Net.Sat.Extrato.FastReport.OpenSource.xml</DocumentationFile>
-  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="FastReport.OpenSource" Version="2022.2.2" />
+		<PackageReference Include="FastReport.OpenSource.Export.PdfSimple" Version="2022.2.2" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <OutputPath>..\..\bin\Debug\</OutputPath>
-    <DocumentationFile>..\..\bin\Debug\netstandard2.0\OpenAC.Net.Sat.Extrato.FastReport.OpenSource.xml</DocumentationFile>
-  </PropertyGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' != 'net452'">
+		<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
-    <OutputPath>..\..\bin\Release\</OutputPath>
-    <DocumentationFile>..\..\bin\Release\netstandard2.0\OpenAC.Net.Sat.Extrato.FastReport.OpenSource.xml</DocumentationFile>
-  </PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\OpenAC.Net.Sat\OpenAC.Net.Sat.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Remove="Extrato\ExtratoSat.frx" />
-    <None Remove="Extrato\ExtratoSatCancelamento.frx" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Extrato\ExtratoSat.frx" />
-    <EmbeddedResource Include="Extrato\ExtratoSatCancelamento.frx" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="FastReport.OpenSource" Version="2021.4.13" />
-    <PackageReference Include="FastReport.OpenSource.Export.PdfSimple" Version="2021.4.13" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\OpenAC.Net.Sat\OpenAC.Net.Sat.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <Reference Include="System.Drawing" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0-windows'">
-    <Reference Include="System.Drawing" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net452'">
+		<Reference Include="System.Drawing" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<None Include="..\..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
 </Project>

@@ -29,7 +29,7 @@
 // <summary></summary>
 // ***********************************************************************
 
-namespace OpenAC.Net.Sat
+namespace OpenAC.Net.Sat.Extensions
 {
     public static class CodigoMPExtensions
     {

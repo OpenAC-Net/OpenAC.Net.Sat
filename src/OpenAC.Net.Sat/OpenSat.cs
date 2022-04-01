@@ -40,15 +40,16 @@ using OpenAC.Net.Core.Logging;
 using OpenAC.Net.DFe.Core;
 using OpenAC.Net.DFe.Core.Common;
 using OpenAC.Net.Sat.Events;
+using OpenAC.Net.Sat.Interfaces;
+using OpenAC.Net.Sat.Library;
 
 namespace OpenAC.Net.Sat
 {
     /// <summary>
     /// Classe OpenSat, responsavel por comunicar com o CF-e-SAT.
     /// </summary>
-    /// <seealso cref="OpenComponent" />
     /// <seealso cref="IOpenLog" />
-    public sealed class OpenSat : OpenComponent, IOpenLog
+    public sealed class OpenSat : OpenDisposable, IOpenLog
     {
         #region Fields
 
@@ -126,6 +127,21 @@ namespace OpenAC.Net.Sat
         public event EventHandler<EventArgs> AguardandoRespostaChanged;
 
         #endregion Events
+
+        #region Constructors
+
+        public OpenSat()
+        {
+            Configuracoes = new SatGeralConfig();
+            Arquivos = new SatArquivoConfig();
+            Encoding = Encoding.UTF8;
+
+            PathDll = @"C:\SAT\SAT.dll";
+            CodigoAtivacao = "sefaz1234";
+            signAC = string.Empty;
+        }
+
+        #endregion Constructors
 
         #region Properties
 
@@ -207,7 +223,7 @@ namespace OpenAC.Net.Sat
             get
             {
                 var e = new ChaveEventArgs { Chave = codigoAtivacao };
-                if (!DesignMode) OnGetCodigoDeAtivacao.Raise(this, e);
+                OnGetCodigoDeAtivacao.Raise(this, e);
 
                 codigoAtivacao = e.Chave;
                 return codigoAtivacao;
@@ -224,7 +240,7 @@ namespace OpenAC.Net.Sat
             {
                 var e = new ChaveEventArgs { Chave = signAC };
 
-                if (!DesignMode) OnGetSignAC.Raise(this, e);
+                OnGetSignAC.Raise(this, e);
 
                 signAC = e.Chave;
                 return signAC;
@@ -249,8 +265,6 @@ namespace OpenAC.Net.Sat
         #endregion Properties
 
         #region Methods
-
-        #region Public
 
         /// <summary>
         /// Ativa o OpenSat, obrigatorio antes de chamar qualquer metodo.
@@ -750,8 +764,6 @@ namespace OpenAC.Net.Sat
             }
         }
 
-        #endregion Public
-
         #region Private
 
         private void IniciaComando(string comandoLog)
@@ -805,29 +817,12 @@ namespace OpenAC.Net.Sat
             Sessao = e.Sessao;
         }
 
-        #endregion Private
-
-        #region Override
-
-        /// <inheritdoc />
-        protected override void OnInitialize()
-        {
-            Configuracoes = new SatGeralConfig();
-            Arquivos = new SatArquivoConfig();
-            Encoding = Encoding.UTF8;
-
-            PathDll = @"C:\SAT\SAT.dll";
-            CodigoAtivacao = "sefaz1234";
-            signAC = string.Empty;
-        }
-
-        /// <inheritdoc />
-        protected override void OnDisposing()
+        protected override void DisposeManaged()
         {
             if (Ativo) Desativar();
         }
 
-        #endregion Override
+        #endregion Private
 
         #endregion Methods
     }

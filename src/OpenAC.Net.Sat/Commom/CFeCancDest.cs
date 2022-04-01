@@ -34,6 +34,7 @@ using OpenAC.Net.Core.Extensions;
 using OpenAC.Net.DFe.Core.Attributes;
 using OpenAC.Net.DFe.Core.Collection;
 using OpenAC.Net.DFe.Core.Serializer;
+using OpenAC.Net.Sat.Commom;
 
 namespace OpenAC.Net.Sat
 {

@@ -35,7 +35,7 @@ using OpenAC.Net.Core.Extensions;
 using OpenAC.Net.DFe.Core.Attributes;
 using OpenAC.Net.DFe.Core.Serializer;
 
-namespace OpenAC.Net.Sat
+namespace OpenAC.Net.Sat.Commom
 {
     /// <summary>
     /// Class CancInfCFe. This class cannot be inherited.
