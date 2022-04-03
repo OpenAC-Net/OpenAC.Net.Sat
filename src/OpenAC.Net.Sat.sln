@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29709.97
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAC.Net.Sat", "OpenAC.Net.Sat\OpenAC.Net.Sat.csproj", "{EE443D74-27E7-4236-851E-5E31A8AB8E63}"
 EndProject
@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAC.Net.Sat.Extrato.Fast
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAC.Net.Sat.Extrato.FastReport", "OpenAC.Net.Sat.Extrato.FastReport\OpenAC.Net.Sat.Extrato.FastReport.csproj", "{7660A32A-E629-4755-9639-B2D323B5543D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAC.Net.Sat.Demo", "OpenAC.Net.Sat.Demo\OpenAC.Net.Sat.Demo.csproj", "{3AB2A9A0-0B23-46D0-914E-D29D7B08B453}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAC.Net.Sat.Demo", "OpenAC.Net.Sat.Demo\OpenAC.Net.Sat.Demo.csproj", "{3AB2A9A0-0B23-46D0-914E-D29D7B08B453}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAC.Net.Sat.Extrato.EscPos", "OpenAC.Net.Sat.Extrato.EscPos\OpenAC.Net.Sat.Extrato.EscPos.csproj", "{16ABA353-A02A-4813-917A-CF410418D0A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{3AB2A9A0-0B23-46D0-914E-D29D7B08B453}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AB2A9A0-0B23-46D0-914E-D29D7B08B453}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AB2A9A0-0B23-46D0-914E-D29D7B08B453}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16ABA353-A02A-4813-917A-CF410418D0A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16ABA353-A02A-4813-917A-CF410418D0A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16ABA353-A02A-4813-917A-CF410418D0A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16ABA353-A02A-4813-917A-CF410418D0A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

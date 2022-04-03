@@ -8,7 +8,7 @@
 // ***********************************************************************
 // <copyright file="ExtratoSat.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2016 Projeto OpenAC .Net
+// 		    Copyright (c) 2016 - 2022 Projeto OpenAC .Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -38,12 +38,6 @@ namespace OpenAC.Net.Sat
 {
     public abstract class ExtratoSat : DFeReportClass<FiltroDFeReport>, IExtratoOptions
     {
-        #region Propriedades
-
-        public ExtratoLayOut LayOut { get; set; }
-
-        #endregion Propriedades
-
         #region Methods
 
         public string CalcularConteudoQRCode(string id, DateTime dhEmissao, decimal valor, string cpfcnpj, string assinaturaQrcode)

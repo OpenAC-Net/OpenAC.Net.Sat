@@ -6,9 +6,9 @@
 // Last Modified By : Rafael Dias
 // Last Modified On : 07-05-2018
 // ***********************************************************************
-// <copyright file="FastReportExtensions.cs" company="ACBr.Net">
+// <copyright file="FastReportExtensions.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2016 Grupo ACBr.Net
+// 		    Copyright (c) 2016 - 2022 Projeto OpenAC .Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),

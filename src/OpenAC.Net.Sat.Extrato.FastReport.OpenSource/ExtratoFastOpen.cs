@@ -6,9 +6,9 @@
 // Last Modified By : RFTD
 // Last Modified On : 10-26-2018
 // ***********************************************************************
-// <copyright file="ExtratoFastOpen.cs" company="ACBr.Net">
+// <copyright file="ExtratoFastOpen.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2016 Grupo ACBr.Net
+// 		    Copyright (c) 2016 - 2022 Projeto OpenAC .Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -58,13 +58,13 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 
         #endregion Events
 
-        #region Propriedades
+        #region Properties
 
         public bool DescricaoUmaLinha { get; set; }
 
         public decimal EspacoFinal { get; set; }
 
-        #endregion Propriedades
+        #endregion Properties
 
         #region Methods
 
@@ -168,7 +168,7 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
             {
                 internalReport.Load(e.FilePath);
             }
-            
+
             internalReport.SetParameterValue("Logo", Logo);
             internalReport.SetParameterValue("IsResumido", tipo == ExtratoLayOut.Resumido);
             internalReport.SetParameterValue("IsOneLine", DescricaoUmaLinha);

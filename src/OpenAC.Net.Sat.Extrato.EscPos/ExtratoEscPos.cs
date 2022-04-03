@@ -1,12 +1,12 @@
 ﻿// ***********************************************************************
-// Assembly         : OpenAC.Net.Sat.Extrato.FastReport
-// Author           : RFTD
-// Created          : 06-28-2016
+// Assembly         : OpenAC.Net.Sat.Extrato.EscPos
+// Author           : Rafael Dias
+// Created          : 03-04-2022
 //
-// Last Modified By : RFTD
-// Last Modified On : 10-26-2018
+// Last Modified By : Rafael Dias
+// Last Modified On : 03-04-2022
 // ***********************************************************************
-// <copyright file="ExtratoEventArgs.cs" company="OpenAC .Net">
+// <copyright file="ExtratoEscPos.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 // 		    Copyright (c) 2016 - 2022 Projeto OpenAC .Net
 //
@@ -30,35 +30,43 @@
 // ***********************************************************************
 
 using System;
+using OpenAC.Net.DFe.Core.Common;
+using OpenAC.Net.EscPos;
 
-namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
+namespace OpenAC.Net.Sat.Extrato.EscPos
 {
-    public class ExtratoEventArgs : EventArgs
+    public sealed class ExtratoEscPos : ExtratoSat
     {
-        #region Constructors
+        #region Events
 
-        public ExtratoEventArgs(ExtratoLayOut tipo)
+        public EventHandler<EspPosprintEventArgs> GetPrinter;
+
+        #endregion Events
+
+        #region Properties
+
+        public new FiltroDFeReport Filtro
         {
-            Tipo = tipo;
-            FilePath = string.Empty;
+            get => FiltroDFeReport.Nenhum;
+            set => throw new NotSupportedException("Filtro não é suportado no extrato EscPos");
         }
 
-        #endregion Constructors
+        public EscPosPrinter Printer { get; set; }
 
-        #region Propriedades
+        public bool DescricaoUmaLinha { get; set; }
 
-        /// <summary>
-        /// Retorna o tipo de arquivo necessario.
-        /// </summary>
-        /// <value>The tipo.</value>
-        public ExtratoLayOut Tipo { get; internal set; }
+        public decimal EspacoFinal { get; set; }
 
-        /// <summary>
-        /// Define ou retorna o caminho para o arquivo do FastReport.
-        /// </summary>
-        /// <value>The file path.</value>
-        public string FilePath { get; set; }
+        #endregion Properties
 
-        #endregion Propriedades
+        #region Methods
+
+        public override void ImprimirExtrato(CFe cfe) => throw new NotImplementedException();
+
+        public override void ImprimirExtratoResumido(CFe cfe) => throw new NotImplementedException();
+
+        public override void ImprimirExtratoCancelamento(CFeCanc cFeCanc, DFeTipoAmbiente ambiente) => throw new NotImplementedException();
+
+        #endregion Methods
     }
 }

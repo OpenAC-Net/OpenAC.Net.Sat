@@ -36,8 +36,6 @@ namespace OpenAC.Net.Sat
 {
     public interface IExtratoOptions
     {
-        ExtratoLayOut LayOut { get; set; }
-
 #if NETFULL
         Image Logo { get; set; }
 #else

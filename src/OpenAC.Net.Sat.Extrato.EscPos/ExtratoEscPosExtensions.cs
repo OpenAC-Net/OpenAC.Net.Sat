@@ -1,12 +1,12 @@
 ﻿// ***********************************************************************
-// Assembly         : OpenAC.Net.Sat.Extrato.FastReport
-// Author           : RFTD
-// Created          : 06-28-2016
+// Assembly         : OpenAC.Net.Sat.Extrato.EscPos
+// Author           : Rafael Dias
+// Created          : 03-04-2022
 //
-// Last Modified By : RFTD
-// Last Modified On : 10-26-2018
+// Last Modified By : Rafael Dias
+// Last Modified On : 03-04-2022
 // ***********************************************************************
-// <copyright file="ExtratoEventArgs.cs" company="OpenAC .Net">
+// <copyright file="ExtratoEscPosExtensions.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 // 		    Copyright (c) 2016 - 2022 Projeto OpenAC .Net
 //
@@ -30,35 +30,31 @@
 // ***********************************************************************
 
 using System;
+using OpenAC.Net.DFe.Core.Common;
 
-namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
+namespace OpenAC.Net.Sat.Extrato.EscPos
 {
-    public class ExtratoEventArgs : EventArgs
+    public static class ExtratoEscPosExtensions
     {
-        #region Constructors
-
-        public ExtratoEventArgs(ExtratoLayOut tipo)
+        public static void ImprimirExtrato(this OpenSat sat, CFe cfe, Action<ExtratoEscPos> options = null)
         {
-            Tipo = tipo;
-            FilePath = string.Empty;
+            var extrato = new ExtratoEscPos();
+            options?.Invoke(extrato);
+            extrato.ImprimirExtrato(cfe);
         }
 
-        #endregion Constructors
+        public static void ImprimirExtratoCancelamento(this OpenSat sat, CFeCanc cFeCanc, DFeTipoAmbiente ambiente, Action<ExtratoEscPos> options = null)
+        {
+            var extrato = new ExtratoEscPos();
+            options?.Invoke(extrato);
+            extrato.ImprimirExtratoCancelamento(cFeCanc, ambiente);
+        }
 
-        #region Propriedades
-
-        /// <summary>
-        /// Retorna o tipo de arquivo necessario.
-        /// </summary>
-        /// <value>The tipo.</value>
-        public ExtratoLayOut Tipo { get; internal set; }
-
-        /// <summary>
-        /// Define ou retorna o caminho para o arquivo do FastReport.
-        /// </summary>
-        /// <value>The file path.</value>
-        public string FilePath { get; set; }
-
-        #endregion Propriedades
+        public static void ImprimirExtratoResumido(this OpenSat sat, CFe cfe, Action<ExtratoEscPos> options = null)
+        {
+            var extrato = new ExtratoEscPos();
+            options?.Invoke(extrato);
+            extrato.ImprimirExtratoResumido(cfe);
+        }
     }
 }

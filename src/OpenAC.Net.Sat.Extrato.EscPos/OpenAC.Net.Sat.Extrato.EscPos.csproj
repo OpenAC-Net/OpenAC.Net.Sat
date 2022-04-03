@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
+		<AssemblyName>OpenAC.Net.Sat.Extrato.EscPos</AssemblyName>
+		<RootNamespace>OpenAC.Net.Sat.Extrato.EscPos</RootNamespace>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>OpenAC.snk</AssemblyOriginatorKeyFile>
+		<Copyright>Copyright © Projeto OpenAC .Net 2014 - 2022</Copyright>
+		<Company>OpenAC .Net - Automação Comercial em .Net</Company>
+		<Authors>Projeto OpenAC .Net</Authors>
+		<PackageProjectUrl>https://openac-net.github.io/</PackageProjectUrl>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageIconUrl>https://avatars.githubusercontent.com/u/90476515?s=200&amp;v=4</PackageIconUrl>
+		<RepositoryUrl>https://github.com/OpenAC-Net/OpenAC.Net.Sat</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>OpenAC OpenAC.Net SAT CF-e-SAT EscPos Extrato Automação Comercial</PackageTags>
+		<Description>Biblioteca para impressao do extrato do SAT/MFe em EscPos</Description>
+		<NeutralLanguage>pt-BR</NeutralLanguage>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+		<Version>1.0.0.0-beta.1</Version>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<DebugType>embedded</DebugType>
+		<IncludeSymbols>true</IncludeSymbols>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<PackageId>OpenAC.Net.Sat.Extrato.EscPos</PackageId>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\OpenAC.Net.Sat\OpenAC.Net.Sat.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="OpenAC.Net.EscPos" Version="1.0.0-beta.5" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' != 'net452'">
+		<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+	</ItemGroup>
+
+	<ItemGroup Condition=" '$(TargetFramework)' == 'net452'">
+		<Reference Include="System.Drawing" />
+	</ItemGroup>
+
+	
+
+	
+
+	<ItemGroup>
+		<None Include="..\..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
+
+</Project>

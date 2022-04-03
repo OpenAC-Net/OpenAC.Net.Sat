@@ -1,12 +1,12 @@
 ﻿// ***********************************************************************
-// Assembly         : OpenAC.Net.Sat.Extrato.FastReport
-// Author           : RFTD
-// Created          : 06-28-2016
+// Assembly         : OpenAC.Net.Sat.Extrato.EscPos
+// Author           : Rafael Dias
+// Created          : 03-04-2022
 //
-// Last Modified By : RFTD
-// Last Modified On : 10-26-2018
+// Last Modified By : Rafael Dias
+// Last Modified On : 03-04-2022
 // ***********************************************************************
-// <copyright file="ExtratoEventArgs.cs" company="OpenAC .Net">
+// <copyright file="EspPosprintEventArgs.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 // 		    Copyright (c) 2016 - 2022 Projeto OpenAC .Net
 //
@@ -30,35 +30,12 @@
 // ***********************************************************************
 
 using System;
+using OpenAC.Net.EscPos;
 
-namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
+namespace OpenAC.Net.Sat.Extrato.EscPos
 {
-    public class ExtratoEventArgs : EventArgs
+    public class EspPosprintEventArgs : EventArgs
     {
-        #region Constructors
-
-        public ExtratoEventArgs(ExtratoLayOut tipo)
-        {
-            Tipo = tipo;
-            FilePath = string.Empty;
-        }
-
-        #endregion Constructors
-
-        #region Propriedades
-
-        /// <summary>
-        /// Retorna o tipo de arquivo necessario.
-        /// </summary>
-        /// <value>The tipo.</value>
-        public ExtratoLayOut Tipo { get; internal set; }
-
-        /// <summary>
-        /// Define ou retorna o caminho para o arquivo do FastReport.
-        /// </summary>
-        /// <value>The file path.</value>
-        public string FilePath { get; set; }
-
-        #endregion Propriedades
+        public EscPosPrinter Printer { get; set; }
     }
 }
