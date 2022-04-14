@@ -36,21 +36,21 @@ namespace OpenAC.Net.Sat.Extrato.FastReport
 {
     public static class ExtratoFastReportExtensions
     {
-        public static void ImprimirExtrato(this OpenSat sat, CFe cfe, Action<IExtratoOptions> options = null)
+        public static void ImprimirExtrato(this OpenSat sat, CFe cfe, Action<ExtratoFastReport> options = null)
         {
             var extrato = new ExtratoFastReport();
             options?.Invoke(extrato);
             extrato.ImprimirExtrato(cfe);
         }
 
-        public static void ImprimirExtratoCancelamento(this OpenSat sat, CFeCanc cFeCanc, DFeTipoAmbiente ambiente, Action<IExtratoOptions> options = null)
+        public static void ImprimirExtratoCancelamento(this OpenSat sat, CFe cfe, CFeCanc cFeCanc, Action<ExtratoFastReport> options = null)
         {
             var extrato = new ExtratoFastReport();
             options?.Invoke(extrato);
-            extrato.ImprimirExtratoCancelamento(cFeCanc, ambiente);
+            extrato.ImprimirExtratoCancelamento(cfe, cFeCanc);
         }
 
-        public static void ImprimirExtratoResumido(this OpenSat sat, CFe cfe, Action<IExtratoOptions> options = null)
+        public static void ImprimirExtratoResumido(this OpenSat sat, CFe cfe, Action<ExtratoFastReport> options = null)
         {
             var extrato = new ExtratoFastReport();
             options?.Invoke(extrato);

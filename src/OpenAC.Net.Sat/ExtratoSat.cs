@@ -36,7 +36,7 @@ using OpenAC.Net.DFe.Core.Common;
 
 namespace OpenAC.Net.Sat
 {
-    public abstract class ExtratoSat : DFeReportClass<FiltroDFeReport>, IExtratoOptions
+    public abstract class ExtratoSat : DFeReportClass<FiltroDFeReport>
     {
         #region Methods
 
@@ -50,7 +50,7 @@ namespace OpenAC.Net.Sat
 
         public abstract void ImprimirExtratoResumido(CFe cfe);
 
-        public abstract void ImprimirExtratoCancelamento(CFeCanc cFeCanc, DFeTipoAmbiente ambiente);
+        public abstract void ImprimirExtratoCancelamento(CFe cfe, CFeCanc cFeCanc);
 
         #endregion Methods
     }

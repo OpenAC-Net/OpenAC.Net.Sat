@@ -243,14 +243,14 @@ namespace OpenAC.Net.Sat.Demo
             {
                 pctLogo.Image?.Dispose();
                 pctLogo.Image = null;
-                
+
                 extrato.Logo = null;
             }
             else
             {
                 var imgBytes = Convert.FromBase64String(img);
                 pctLogo.Image = imgBytes.ToImage();
-                extrato.Logo = pctLogo.Image.ToByteArray();
+                extrato.Logo = pctLogo.Image;
             }
 
             chkPreview.Checked = config.Get("ExtratoPreview", false);
@@ -419,22 +419,22 @@ namespace OpenAC.Net.Sat.Demo
         private void imprimirExtratoVendaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (cfeAtual.IsNull()) return;
-            if(extrato.Filtro != FiltroDFeReport.Nenhum && extrato.NomeArquivo.IsEmpty()) return;;
+            if (extrato.Filtro != FiltroDFeReport.Nenhum && extrato.NomeArquivo.IsEmpty()) return; ;
 
             extrato.ImprimirExtrato(cfeAtual);
-            
-            if(extrato.Filtro == FiltroDFeReport.Nenhum) return;
+
+            if (extrato.Filtro == FiltroDFeReport.Nenhum) return;
             MessageBox.Show(this, @"Extrato impresso com sucesso !", @"S@T Demo");
         }
 
         private void imprimirExtratoVendaResumidoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (cfeAtual.IsNull()) return;
-            if(extrato.Filtro != FiltroDFeReport.Nenhum && extrato.NomeArquivo.IsEmpty()) return;;
+            if (extrato.Filtro != FiltroDFeReport.Nenhum && extrato.NomeArquivo.IsEmpty()) return; ;
 
             extrato.ImprimirExtratoResumido(cfeAtual);
 
-            if(extrato.Filtro == FiltroDFeReport.Nenhum) return;
+            if (extrato.Filtro == FiltroDFeReport.Nenhum) return;
             MessageBox.Show(this, @"Extrato impresso com sucesso !", @"S@T Demo");
         }
 
@@ -485,7 +485,7 @@ namespace OpenAC.Net.Sat.Demo
         private void imprimirExtratoCancelamentoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (cfeAtual.IsNull() || cfeCancAtual.IsNull()) return;
-            extrato.ImprimirExtratoCancelamento(cfeCancAtual, cfeAtual.InfCFe.Ide.TpAmb ?? DFeTipoAmbiente.Homologacao);
+            extrato.ImprimirExtratoCancelamento(cfeAtual, cfeCancAtual);
         }
 
         private void consultarStatusOperacionalToolStripMenuItem_Click(object sender, EventArgs e)
@@ -867,7 +867,7 @@ namespace OpenAC.Net.Sat.Demo
 
             var img = Image.FromFile(file);
             pctLogo.Image = img;
-            extrato.Logo = img.ToByteArray();
+            extrato.Logo = img;
         }
 
         private void limparLogoToolStripMenuItem_Click(object sender, EventArgs e)

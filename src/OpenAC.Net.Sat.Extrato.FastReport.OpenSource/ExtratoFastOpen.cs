@@ -82,9 +82,10 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
             Imprimir();
         }
 
-        public override void ImprimirExtratoCancelamento(CFeCanc cFeCanc, DFeTipoAmbiente ambiente)
+        public override void ImprimirExtratoCancelamento(CFe cfe, CFeCanc cFeCanc)
         {
-            PrepararImpressao(ExtratoLayOut.Cancelamento, ambiente);
+            PrepararImpressao(ExtratoLayOut.Cancelamento, cfe.InfCFe.Ide.TpAmb ?? DFeTipoAmbiente.Homologacao);
+            internalReport.RegisterData(new[] { cfe }, "CFe");
             internalReport.RegisterData(new[] { cFeCanc }, "CFeCanc");
             Imprimir();
         }
