@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace OpenAC.Net.Sat.Demo
+namespace OpenAC.Net.Sat.Demo.Commom
 {
     public static class InputBox
     {

@@ -65,20 +65,22 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                 var e = new EspPosprintEventArgs();
                 GetPrinter.Raise(this, e);
-                return e.Printer;
+                printer = e.Printer;
+
+                return printer;
             }
             set => printer = value;
         }
 
-        public bool DescricaoUmaLinha { get; set; }
+        public bool DescricaoUmaLinha { get; set; } = true;
 
-        public bool UsarBarrasComoCodigo { get; set; }
+        public bool UsarBarrasComoCodigo { get; set; } = true;
 
-        public int CasasDecimaisQuantidade { get; set; }
+        public int CasasDecimaisQuantidade { get; set; } = 2;
 
-        public bool ImprimirDeOlhoNoImposto { get; set; }
+        public bool ImprimirDeOlhoNoImposto { get; set; } = true;
 
-        public bool CortarPapel { get; set; }
+        public bool CortarPapel { get; set; } = true;
 
         #endregion Properties
 
@@ -92,9 +94,10 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
         private void Imprimir(ExtratoLayOut tipo, DFeTipoAmbiente ambiente, CFe cfe, CFeCanc cFeCanc)
         {
-            var printer = Printer;
+            if (!Printer.Conectado)
+                Printer.Conectar();
 
-            var centralizado = printer.Colunas < 48 ? CmdAlinhamento.Esquerda : CmdAlinhamento.Centro;
+            var centralizado = Printer.Colunas < 48 ? CmdAlinhamento.Esquerda : CmdAlinhamento.Centro;
             var cultura = new CultureInfo("pt-Br");
             var numeroExtrato = ambiente == DFeTipoAmbiente.Homologacao ? "000000" : cfe.InfCFe.Ide.NCFe.ToString();
 
@@ -103,29 +106,29 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
             #region Logotipo
 
             if (Logo != null)
-                printer.ImprimirImagem(Logo, centralizado);
+                Printer.ImprimirImagem(Logo, centralizado);
 
             #endregion Logotipo
 
             #region Dados do Emitente
 
-            printer.ImprimirTexto(!cfe.InfCFe.Emit.XFant.IsEmpty() ? cfe.InfCFe.Emit.XFant.FillRight(printer.Colunas) :
-                                                                     cfe.InfCFe.Emit.XNome.LimitarString(printer.Colunas), centralizado, CmdEstiloFonte.Negrito);
+            Printer.ImprimirTexto(!cfe.InfCFe.Emit.XFant.IsEmpty() ? cfe.InfCFe.Emit.XFant.FillRight(Printer.Colunas) :
+                                                                     cfe.InfCFe.Emit.XNome.LimitarString(Printer.Colunas), centralizado, CmdEstiloFonte.Negrito);
 
-            printer.ImprimirTexto(cfe.InfCFe.Emit.XNome.LimitarString(printer.Colunas));
-            printer.ImprimirTexto(AjustarTextoColunas($"Cnpj: {cfe.InfCFe.Emit.CNPJ.FormataCPFCNPJ()}", $"I.E.: {cfe.InfCFe.Emit.IE}", printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
-            printer.ImprimirTexto($"End.: {cfe.InfCFe.Emit.EnderEmit.XLgr},{cfe.InfCFe.Emit.EnderEmit.Nro} {cfe.InfCFe.Emit.EnderEmit.XCpl}", CmdTamanhoFonte.Condensada);
-            printer.ImprimirTexto($"Bairro: {cfe.InfCFe.Emit.EnderEmit.XBairro} - {cfe.InfCFe.Emit.EnderEmit.XMun} - {cfe.InfCFe.Emit.EnderEmit.CEP.FormataCEP()}", CmdTamanhoFonte.Condensada);
-            printer.ImprimirSeparador();
+            Printer.ImprimirTexto(cfe.InfCFe.Emit.XNome.LimitarString(Printer.Colunas));
+            Printer.ImprimirTexto(AjustarTextoColunas($"Cnpj: {cfe.InfCFe.Emit.CNPJ.FormataCPFCNPJ()}", $"I.E.: {cfe.InfCFe.Emit.IE}", Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+            Printer.ImprimirTexto($"End.: {cfe.InfCFe.Emit.EnderEmit.XLgr},{cfe.InfCFe.Emit.EnderEmit.Nro} {cfe.InfCFe.Emit.EnderEmit.XCpl}", CmdTamanhoFonte.Condensada);
+            Printer.ImprimirTexto($"Bairro: {cfe.InfCFe.Emit.EnderEmit.XBairro} - {cfe.InfCFe.Emit.EnderEmit.XMun} - {cfe.InfCFe.Emit.EnderEmit.CEP.FormataCEP()}", CmdTamanhoFonte.Condensada);
+            Printer.ImprimirSeparador();
 
             #endregion Dados do Emitente
 
             #region Dados do extrato
 
-            printer.ImprimirTexto($"Extrato No. {numeroExtrato}", centralizado, CmdEstiloFonte.Negrito);
-            printer.ImprimirTexto("CUPOM FISCAL ELETRÔNICO SAT", centralizado, CmdEstiloFonte.Negrito);
+            Printer.ImprimirTexto($"Extrato No. {numeroExtrato}", centralizado, CmdEstiloFonte.Negrito);
+            Printer.ImprimirTexto("CUPOM FISCAL ELETRÔNICO SAT", centralizado, CmdEstiloFonte.Negrito);
             if (cFeCanc != null)
-                printer.ImprimirTexto("CANCELAMENTO", centralizado, CmdEstiloFonte.Negrito);
+                Printer.ImprimirTexto("CANCELAMENTO", centralizado, CmdEstiloFonte.Negrito);
 
             #endregion Dados do extrato
 
@@ -133,14 +136,14 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
             if (ambiente == DFeTipoAmbiente.Homologacao)
             {
-                printer.ImprimirSeparador();
+                Printer.ImprimirSeparador();
 
-                printer.ImprimirTexto("=   T E S T E   =", CmdTamanhoFonte.Expandida, CmdAlinhamento.Centro, CmdEstiloFonte.Negrito);
-                printer.ImprimirTexto(new string('>', printer.Colunas), CmdEstiloFonte.Negrito);
-                printer.ImprimirTexto(new string('>', printer.Colunas), CmdEstiloFonte.Negrito);
-                printer.ImprimirTexto(new string('>', printer.Colunas), CmdEstiloFonte.Negrito);
+                Printer.ImprimirTexto("=   T E S T E   =", CmdTamanhoFonte.Expandida, CmdAlinhamento.Centro, CmdEstiloFonte.Negrito);
+                Printer.ImprimirTexto(new string('>', Printer.Colunas), CmdEstiloFonte.Negrito);
+                Printer.ImprimirTexto(new string('>', Printer.Colunas), CmdEstiloFonte.Negrito);
+                Printer.ImprimirTexto(new string('>', Printer.Colunas), CmdEstiloFonte.Negrito);
 
-                printer.ImprimirSeparador();
+                Printer.ImprimirSeparador();
             }
 
             #endregion Homologação
@@ -157,22 +160,22 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                         cfe.InfCFe.Dest?.CNPJ.IsEmpty() == true ? cfe.InfCFe.Dest.CNPJ.FormataCNPJ() :
                         "000.000.000-00";
 
-                    printer.ImprimirTexto($"CPF/CNPJ do Consumidor: {cpfcnpj}", CmdTamanhoFonte.Condensada);
-                    printer.ImprimirTexto($"Razão Social/Nome: {(cfe.InfCFe.Dest?.Nome ?? "CONSUMIDOR")}".LimitarString(printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                    Printer.ImprimirTexto($"CPF/CNPJ do Consumidor: {cpfcnpj}", CmdTamanhoFonte.Condensada);
+                    Printer.ImprimirTexto($"Razão Social/Nome: {(cfe.InfCFe.Dest?.Nome ?? "CONSUMIDOR")}".LimitarString(Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
 
-                    printer.ImprimirSeparador();
+                    Printer.ImprimirSeparador();
 
                     #endregion Consumidor
 
                     #region Detalhes
 
-                    if (printer.Colunas >= 48)
-                        printer.ImprimirTexto("#|COD|DESC|QTD|UN|VL UN|DESC|VL ITEM", CmdAlinhamento.Centro,
+                    if (Printer.Colunas >= 48)
+                        Printer.ImprimirTexto("#|COD|DESC|QTD|UN|VL UN|DESC|VL ITEM", CmdAlinhamento.Centro,
                             CmdEstiloFonte.Negrito);
                     else
-                        printer.ImprimirTexto("COD|DESC|QTD|UN|VL UN|DESC|VL ITEM", CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto("COD|DESC|QTD|UN|VL UN|DESC|VL ITEM", CmdEstiloFonte.Negrito);
 
-                    printer.ImprimirSeparador();
+                    Printer.ImprimirSeparador();
 
                     #region Produtos
 
@@ -187,65 +190,65 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                         var textoR =
                             $"{det.Prod.QCom.ToString($"N{CasasDecimaisQuantidade}")} {det.Prod.UCom} x {det.Prod.VUnCom:N2} = {det.Prod.VItem:N2}";
 
-                        printer.ImprimirTexto(AjustarTextoColunas(textoE, textoR, printer.ColunasCondensada),
+                        Printer.ImprimirTexto(AjustarTextoColunas(textoE, textoR, Printer.ColunasCondensada),
                             CmdTamanhoFonte.Condensada);
 
                         if (!DescricaoUmaLinha)
-                            printer.ImprimirTexto(det.Prod.XProd.LimitarString(printer.ColunasCondensada),
+                            Printer.ImprimirTexto(det.Prod.XProd.LimitarString(Printer.ColunasCondensada),
                                 CmdTamanhoFonte.Condensada);
 
                         if (det.Prod.VOutro > 0)
-                            printer.ImprimirTexto(
+                            Printer.ImprimirTexto(
                                 AjustarTextoColunas("Acréscimos:", det.Prod.VDesc.ToString("C2", cultura),
-                                    printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                                    Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
 
                         if (det.Prod.VDesc > 0)
-                            printer.ImprimirTexto(
+                            Printer.ImprimirTexto(
                                 AjustarTextoColunas("Descontos:", det.Prod.VDesc.ToString("C2", cultura),
-                                    printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                                    Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
                     }
 
-                    printer.ImprimirSeparador();
+                    Printer.ImprimirSeparador();
 
                     #region Totais
 
-                    printer.ImprimirTexto(
+                    Printer.ImprimirTexto(
                         AjustarTextoColunas("Qtde. total de itens:", cfe.InfCFe.Det.Count.ToString("N0", cultura),
-                            printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
-                    printer.ImprimirTexto(
+                            Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                    Printer.ImprimirTexto(
                         AjustarTextoColunas("Subtotal:", cfe.InfCFe.Total.ICMSTot.VProd.ToString("C2", cultura),
-                            printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                            Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
 
                     if (cfe.InfCFe.Total.ICMSTot.VOutro > 0)
-                        printer.ImprimirTexto(
+                        Printer.ImprimirTexto(
                             AjustarTextoColunas("Acréscimos:", cfe.InfCFe.Total.ICMSTot.VOutro.ToString("C2", cultura),
-                                printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                                Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
 
                     if (cfe.InfCFe.Total.ICMSTot.VDesc > 0)
-                        printer.ImprimirTexto(
+                        Printer.ImprimirTexto(
                             AjustarTextoColunas("Descontos:", cfe.InfCFe.Total.ICMSTot.VDesc.ToString("C2", cultura),
-                                printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                                Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
 
-                    printer.ImprimirTexto(
-                        AjustarTextoColunas("Valor TOTAL:", cfe.InfCFe.Total.VCFe.ToString("C2", cultura), printer.Colunas),
+                    Printer.ImprimirTexto(
+                        AjustarTextoColunas("Valor TOTAL:", cfe.InfCFe.Total.VCFe.ToString("C2", cultura), Printer.Colunas),
                         CmdEstiloFonte.Negrito);
 
                     #endregion Totais
 
                     #endregion Produtos
 
-                    printer.PularLinhas(1);
+                    Printer.PularLinhas(1);
 
                     #region Pagamentos
 
                     foreach (var pagto in cfe.InfCFe.Pagto.Pagamentos)
-                        printer.ImprimirTexto(
+                        Printer.ImprimirTexto(
                             AjustarTextoColunas(pagto.CMp.GetDescription(), pagto.VMp.ToString("C2", cultura),
-                                printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                                Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
 
-                    printer.ImprimirTexto(AjustarTextoColunas("Troco:", cfe.InfCFe.Pagto.VTroco.ToString("C2", cultura),
-                        printer.Colunas));
-                    printer.PularLinhas(1);
+                    Printer.ImprimirTexto(AjustarTextoColunas("Troco:", cfe.InfCFe.Pagto.VTroco.ToString("C2", cultura),
+                        Printer.Colunas));
+                    Printer.PularLinhas(1);
 
                     #endregion Pagamentos
 
@@ -257,10 +260,10 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     if (cfe.InfCFe.Entrega != null && !cfe.InfCFe.Entrega.XLgr.IsNull())
                     {
-                        printer.ImprimirTexto("DADOS PARA ENTREGA", centralizado, CmdEstiloFonte.Negrito);
-                        printer.ImprimirTexto($"End.: {cfe.InfCFe.Entrega.XLgr}, {cfe.InfCFe.Entrega.Nro} {cfe.InfCFe.Entrega.XCpl}", CmdTamanhoFonte.Condensada);
-                        printer.ImprimirTexto($"Bairro: {cfe.InfCFe.Entrega.XBairro} - {cfe.InfCFe.Entrega.XMun}/{cfe.InfCFe.Entrega.UF}", CmdTamanhoFonte.Condensada);
-                        printer.ImprimirSeparador();
+                        Printer.ImprimirTexto("DADOS PARA ENTREGA", centralizado, CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto($"End.: {cfe.InfCFe.Entrega.XLgr}, {cfe.InfCFe.Entrega.Nro} {cfe.InfCFe.Entrega.XCpl}", CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirTexto($"Bairro: {cfe.InfCFe.Entrega.XBairro} - {cfe.InfCFe.Entrega.XMun}/{cfe.InfCFe.Entrega.UF}", CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirSeparador();
                     }
 
                     #endregion Dados da entrega
@@ -269,27 +272,27 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     if (cfe.InfCFe.InfAdic.ObsFisco.Any())
                     {
-                        printer.ImprimirTexto("Observações do Fisco", CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto("Observações do Fisco", CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
 
-                        foreach (var txt in cfe.InfCFe.InfAdic.ObsFisco.Select(fisco => $"{fisco.XCampo} - {fisco.XTexto}").SelectMany(texto => texto.WrapText(printer.Colunas)))
+                        foreach (var txt in cfe.InfCFe.InfAdic.ObsFisco.Select(fisco => $"{fisco.XCampo} - {fisco.XTexto}").SelectMany(texto => texto.WrapText(Printer.Colunas)))
                         {
-                            printer.ImprimirTexto(txt, CmdTamanhoFonte.Condensada);
+                            Printer.ImprimirTexto(txt, CmdTamanhoFonte.Condensada);
                         }
 
-                        printer.PularLinhas(1);
+                        Printer.PularLinhas(1);
                     }
 
                     #endregion Observações do Fisco
 
                     #region Observações do Contribuinte
 
-                    printer.ImprimirTexto("Observações do Contribuinte", CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                    Printer.ImprimirTexto("Observações do Contribuinte", CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
 
                     if (!cfe.InfCFe.InfAdic.InfCpl.IsNull())
-                        foreach (var txt in cfe.InfCFe.InfAdic.InfCpl.WrapText(printer.Colunas))
-                            printer.ImprimirTexto(txt, CmdTamanhoFonte.Condensada);
+                        foreach (var txt in cfe.InfCFe.InfAdic.InfCpl.WrapText(Printer.Colunas))
+                            Printer.ImprimirTexto(txt, CmdTamanhoFonte.Condensada);
 
-                    printer.PularLinhas(1);
+                    Printer.PularLinhas(1);
 
                     #endregion Observações do Contribuinte
 
@@ -297,18 +300,18 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     if (ImprimirDeOlhoNoImposto)
                     {
-                        printer.ImprimirTexto(AjustarTextoColunas("Valor aproximado dos Tributos deste Cupom", cfe.InfCFe.Total.VCFeLei12741.ToString("C2", cultura), printer.Colunas), CmdTamanhoFonte.Condensada);
-                        printer.ImprimirTexto("(Conforme Lei Fed. 12.741/2012)", CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirTexto(AjustarTextoColunas("Valor aproximado dos Tributos deste Cupom", cfe.InfCFe.Total.VCFeLei12741.ToString("C2", cultura), Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirTexto("(Conforme Lei Fed. 12.741/2012)", CmdTamanhoFonte.Condensada);
 
-                        printer.ImprimirSeparador();
+                        Printer.ImprimirSeparador();
                     }
 
                     #endregion Tributos
 
                     #region Número do extrato
 
-                    printer.ImprimirTexto($"SAT No. {numeroExtrato}", centralizado);
-                    printer.ImprimirTexto($"Data e Hora {cfe.InfCFe.Ide.DEmi:dd/MM/yyyy} {cfe.InfCFe.Ide.HEmi:HH:mm:ss}", CmdTamanhoFonte.Condensada, centralizado);
+                    Printer.ImprimirTexto($"SAT No. {numeroExtrato}", centralizado);
+                    Printer.ImprimirTexto($"Data e Hora {cfe.InfCFe.Ide.DEmi:dd/MM/yyyy} {cfe.InfCFe.Ide.HEmi:HH:mm:ss}", CmdTamanhoFonte.Condensada, centralizado);
 
                     #endregion Número do extrato
 
@@ -316,29 +319,29 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     var chave = Regex.Replace(cfe.InfCFe.Id.OnlyNumbers(), ".{4}", "$0 ");
 
-                    if (printer.Colunas >= 48)
-                        printer.ImprimirTexto(chave, CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro, CmdEstiloFonte.Negrito);
+                    if (Printer.Colunas >= 48)
+                        Printer.ImprimirTexto(chave, CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro, CmdEstiloFonte.Negrito);
                     else
                     {
-                        printer.ImprimirTexto(chave.Substring(0, 24).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
-                        printer.ImprimirTexto(chave.Substring(24).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto(chave.Substring(0, 24).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto(chave.Substring(24).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
                     }
 
-                    if (printer.Colunas >= 48)
+                    if (Printer.Colunas >= 48)
                     {
-                        printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(0, 22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
-                        printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
+                        Printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(0, 22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
+                        Printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
                     }
                     else
                     {
-                        printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(0, 11), CmdBarcode.CODE128c);
-                        printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(11, 11), CmdBarcode.CODE128c);
-                        printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(22, 11), CmdBarcode.CODE128c);
-                        printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(33), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(0, 11), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(11, 11), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(22, 11), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(33), CmdBarcode.CODE128c);
                     }
 
-                    if (printer.Colunas >= 48)
-                        printer.PularLinhas(1);
+                    if (Printer.Colunas >= 48)
+                        Printer.PularLinhas(1);
 
                     #endregion Chave de Acesso
 
@@ -350,39 +353,28 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                                  $"{(cfe.InfCFe.Dest?.CNPJ.IsEmpty() == false ? cfe.InfCFe.Dest.CNPJ : cfe.InfCFe.Dest?.CPF)}|" +
                                  $"{cfe.InfCFe.Ide.AssinaturaQrcode}";
 
-                    printer.ImprimirQrCode(qrCode, aAlinhamento: centralizado, tamanho: printer.Colunas >= 48 ? QrCodeModSize.Normal : QrCodeModSize.Pequeno);
+                    Printer.ImprimirQrCode(qrCode, aAlinhamento: centralizado, tamanho: Printer.Colunas >= 48 ? QrCodeModSize.Normal : QrCodeModSize.Pequeno);
 
-                    if (printer.Colunas >= 48)
-                        printer.PularLinhas(1);
+                    if (Printer.Colunas >= 48)
+                        Printer.PularLinhas(1);
 
                     #endregion QrCode
 
                     #region App
 
-                    if (printer.Colunas >= 48)
+                    if (Printer.Colunas >= 48)
                     {
-                        printer.ImprimirTexto("Consulte o QR Code pelo aplicativo \"De olho na nota\"", CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro);
-                        printer.ImprimirTexto("disponível na AppStore (Apple) e PlayStore (Android)", CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro);
+                        Printer.ImprimirTexto("Consulte o QR Code pelo aplicativo \"De olho na nota\"", CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro);
+                        Printer.ImprimirTexto("disponível na AppStore (Apple) e PlayStore (Android)", CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro);
                     }
                     else
                     {
-                        printer.ImprimirTexto("Consulte o QR Code pelo aplicativo", CmdTamanhoFonte.Condensada);
-                        printer.ImprimirTexto("\"De olho na nota\" disponível na", CmdTamanhoFonte.Condensada);
-                        printer.ImprimirTexto("AppStore (Apple) e PlayStore (Android)", CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirTexto("Consulte o QR Code pelo aplicativo", CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirTexto("\"De olho na nota\" disponível na", CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirTexto("AppStore (Apple) e PlayStore (Android)", CmdTamanhoFonte.Condensada);
                     }
 
                     #endregion App
-
-                    #region Desenvolvedor
-
-                    if (!SoftwareHouse.IsEmpty())
-                    {
-                        printer.PularLinhas(1);
-                        printer.ImprimirTexto(SoftwareHouse, printer.Colunas >= 48 ? CmdAlinhamento.Direita : CmdAlinhamento.Esquerda);
-                        printer.PularLinhas(1);
-                    }
-
-                    #endregion Desenvolvedor
 
                     #endregion Rodape
 
@@ -396,50 +388,50 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                         cfe.InfCFe.Dest?.CNPJ.IsEmpty() == true ? cfe.InfCFe.Dest.CNPJ.FormataCNPJ() :
                         "000.000.000-00";
 
-                    printer.ImprimirTexto($"CPF/CNPJ do Consumidor: {cpofCnpjR}", CmdTamanhoFonte.Condensada);
-                    printer.ImprimirTexto($"Razão Social/Nome: {(cfe.InfCFe.Dest?.Nome ?? "CONSUMIDOR")}".LimitarString(printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                    Printer.ImprimirTexto($"CPF/CNPJ do Consumidor: {cpofCnpjR}", CmdTamanhoFonte.Condensada);
+                    Printer.ImprimirTexto($"Razão Social/Nome: {(cfe.InfCFe.Dest?.Nome ?? "CONSUMIDOR")}".LimitarString(Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
 
-                    printer.ImprimirSeparador();
+                    Printer.ImprimirSeparador();
 
                     #endregion Consumidor
 
                     #region Totais
 
-                    printer.ImprimirTexto(
+                    Printer.ImprimirTexto(
                         AjustarTextoColunas("Qtde. total de itens:", cfe.InfCFe.Det.Count.ToString("N0", cultura),
-                            printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
-                    printer.ImprimirTexto(
+                            Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                    Printer.ImprimirTexto(
                         AjustarTextoColunas("Subtotal:", cfe.InfCFe.Total.ICMSTot.VProd.ToString("C2", cultura),
-                            printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                            Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
 
                     if (cfe.InfCFe.Total.ICMSTot.VOutro > 0)
-                        printer.ImprimirTexto(
+                        Printer.ImprimirTexto(
                             AjustarTextoColunas("Acréscimos:", cfe.InfCFe.Total.ICMSTot.VOutro.ToString("C2", cultura),
-                                printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                                Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
 
                     if (cfe.InfCFe.Total.ICMSTot.VDesc > 0)
-                        printer.ImprimirTexto(
+                        Printer.ImprimirTexto(
                             AjustarTextoColunas("Descontos:", cfe.InfCFe.Total.ICMSTot.VDesc.ToString("C2", cultura),
-                                printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                                Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
 
-                    printer.ImprimirTexto(
-                        AjustarTextoColunas("Valor TOTAL:", cfe.InfCFe.Total.VCFe.ToString("C2", cultura), printer.Colunas),
+                    Printer.ImprimirTexto(
+                        AjustarTextoColunas("Valor TOTAL:", cfe.InfCFe.Total.VCFe.ToString("C2", cultura), Printer.Colunas),
                         CmdEstiloFonte.Negrito);
 
                     #endregion Totais
 
-                    printer.PularLinhas(1);
+                    Printer.PularLinhas(1);
 
                     #region Pagamentos
 
                     foreach (var pagto in cfe.InfCFe.Pagto.Pagamentos)
-                        printer.ImprimirTexto(
+                        Printer.ImprimirTexto(
                             AjustarTextoColunas(pagto.CMp.GetDescription(), pagto.VMp.ToString("C2", cultura),
-                                printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                                Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
 
-                    printer.ImprimirTexto(AjustarTextoColunas("Troco:", cfe.InfCFe.Pagto.VTroco.ToString("C2", cultura),
-                        printer.Colunas));
-                    printer.PularLinhas(1);
+                    Printer.ImprimirTexto(AjustarTextoColunas("Troco:", cfe.InfCFe.Pagto.VTroco.ToString("C2", cultura),
+                        Printer.Colunas));
+                    Printer.PularLinhas(1);
 
                     #endregion Pagamentos
 
@@ -449,10 +441,10 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     if (cfe.InfCFe.Entrega != null && !cfe.InfCFe.Entrega.XLgr.IsNull())
                     {
-                        printer.ImprimirTexto("DADOS PARA ENTREGA", centralizado, CmdEstiloFonte.Negrito);
-                        printer.ImprimirTexto($"End.: {cfe.InfCFe.Entrega.XLgr}, {cfe.InfCFe.Entrega.Nro} {cfe.InfCFe.Entrega.XCpl}", CmdTamanhoFonte.Condensada);
-                        printer.ImprimirTexto($"Bairro: {cfe.InfCFe.Entrega.XBairro} - {cfe.InfCFe.Entrega.XMun}/{cfe.InfCFe.Entrega.UF}", CmdTamanhoFonte.Condensada);
-                        printer.ImprimirSeparador();
+                        Printer.ImprimirTexto("DADOS PARA ENTREGA", centralizado, CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto($"End.: {cfe.InfCFe.Entrega.XLgr}, {cfe.InfCFe.Entrega.Nro} {cfe.InfCFe.Entrega.XCpl}", CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirTexto($"Bairro: {cfe.InfCFe.Entrega.XBairro} - {cfe.InfCFe.Entrega.XMun}/{cfe.InfCFe.Entrega.UF}", CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirSeparador();
                     }
 
                     #endregion Dados da entrega
@@ -461,27 +453,27 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     if (cfe.InfCFe.InfAdic.ObsFisco.Any())
                     {
-                        printer.ImprimirTexto("Observações do Fisco", CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto("Observações do Fisco", CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
 
-                        foreach (var txt in cfe.InfCFe.InfAdic.ObsFisco.Select(fisco => $"{fisco.XCampo} - {fisco.XTexto}").SelectMany(texto => texto.WrapText(printer.Colunas)))
+                        foreach (var txt in cfe.InfCFe.InfAdic.ObsFisco.Select(fisco => $"{fisco.XCampo} - {fisco.XTexto}").SelectMany(texto => texto.WrapText(Printer.Colunas)))
                         {
-                            printer.ImprimirTexto(txt, CmdTamanhoFonte.Condensada);
+                            Printer.ImprimirTexto(txt, CmdTamanhoFonte.Condensada);
                         }
 
-                        printer.PularLinhas(1);
+                        Printer.PularLinhas(1);
                     }
 
                     #endregion Observações do Fisco
 
                     #region Observações do Contribuinte
 
-                    printer.ImprimirTexto("Observações do Contribuinte", CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                    Printer.ImprimirTexto("Observações do Contribuinte", CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
 
                     if (!cfe.InfCFe.InfAdic.InfCpl.IsNull())
-                        foreach (var txt in cfe.InfCFe.InfAdic.InfCpl.WrapText(printer.Colunas))
-                            printer.ImprimirTexto(txt, CmdTamanhoFonte.Condensada);
+                        foreach (var txt in cfe.InfCFe.InfAdic.InfCpl.WrapText(Printer.Colunas))
+                            Printer.ImprimirTexto(txt, CmdTamanhoFonte.Condensada);
 
-                    printer.PularLinhas(1);
+                    Printer.PularLinhas(1);
 
                     #endregion Observações do Contribuinte
 
@@ -489,18 +481,18 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     if (ImprimirDeOlhoNoImposto)
                     {
-                        printer.ImprimirTexto(AjustarTextoColunas("Valor aproximado dos Tributos deste Cupom", cfe.InfCFe.Total.VCFeLei12741.ToString("C2", cultura), printer.Colunas), CmdTamanhoFonte.Condensada);
-                        printer.ImprimirTexto("(Conforme Lei Fed. 12.741/2012)", CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirTexto(AjustarTextoColunas("Valor aproximado dos Tributos deste Cupom", cfe.InfCFe.Total.VCFeLei12741.ToString("C2", cultura), Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirTexto("(Conforme Lei Fed. 12.741/2012)", CmdTamanhoFonte.Condensada);
 
-                        printer.ImprimirSeparador();
+                        Printer.ImprimirSeparador();
                     }
 
                     #endregion Tributos
 
                     #region Número do extrato
 
-                    printer.ImprimirTexto($"SAT No. {numeroExtrato}", centralizado);
-                    printer.ImprimirTexto($"Data e Hora {cfe.InfCFe.Ide.DEmi:dd/MM/yyyy} {cfe.InfCFe.Ide.HEmi:HH:mm:ss}", CmdTamanhoFonte.Condensada, centralizado);
+                    Printer.ImprimirTexto($"SAT No. {numeroExtrato}", centralizado);
+                    Printer.ImprimirTexto($"Data e Hora {cfe.InfCFe.Ide.DEmi:dd/MM/yyyy} {cfe.InfCFe.Ide.HEmi:HH:mm:ss}", CmdTamanhoFonte.Condensada, centralizado);
 
                     #endregion Número do extrato
 
@@ -508,29 +500,29 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     var chaveResumido = Regex.Replace(cfe.InfCFe.Id.OnlyNumbers(), ".{4}", "$0 ");
 
-                    if (printer.Colunas >= 48)
-                        printer.ImprimirTexto(chaveResumido, CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro, CmdEstiloFonte.Negrito);
+                    if (Printer.Colunas >= 48)
+                        Printer.ImprimirTexto(chaveResumido, CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro, CmdEstiloFonte.Negrito);
                     else
                     {
-                        printer.ImprimirTexto(chaveResumido.Substring(0, 24).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
-                        printer.ImprimirTexto(chaveResumido.Substring(24).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto(chaveResumido.Substring(0, 24).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto(chaveResumido.Substring(24).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
                     }
 
-                    if (printer.Colunas >= 48)
+                    if (Printer.Colunas >= 48)
                     {
-                        printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(0, 22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
-                        printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
+                        Printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(0, 22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
+                        Printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
                     }
                     else
                     {
-                        printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(0, 11), CmdBarcode.CODE128c);
-                        printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(11, 11), CmdBarcode.CODE128c);
-                        printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(22, 11), CmdBarcode.CODE128c);
-                        printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(33), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(0, 11), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(11, 11), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(22, 11), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cfe.InfCFe.Id.OnlyNumbers().Substring(33), CmdBarcode.CODE128c);
                     }
 
-                    if (printer.Colunas >= 48)
-                        printer.PularLinhas(1);
+                    if (Printer.Colunas >= 48)
+                        Printer.PularLinhas(1);
 
                     #endregion Chave de Acesso
 
@@ -542,39 +534,28 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                                  $"{(cfe.InfCFe.Dest?.CNPJ.IsEmpty() == false ? cfe.InfCFe.Dest.CNPJ : cfe.InfCFe.Dest?.CPF)}|" +
                                  $"{cfe.InfCFe.Ide.AssinaturaQrcode}";
 
-                    printer.ImprimirQrCode(qrCodeResumido, aAlinhamento: centralizado, tamanho: printer.Colunas >= 48 ? QrCodeModSize.Normal : QrCodeModSize.Pequeno);
+                    Printer.ImprimirQrCode(qrCodeResumido, aAlinhamento: centralizado, tamanho: Printer.Colunas >= 48 ? QrCodeModSize.Normal : QrCodeModSize.Pequeno);
 
-                    if (printer.Colunas >= 48)
-                        printer.PularLinhas(1);
+                    if (Printer.Colunas >= 48)
+                        Printer.PularLinhas(1);
 
                     #endregion QrCode
 
                     #region App
 
-                    if (printer.Colunas >= 48)
+                    if (Printer.Colunas >= 48)
                     {
-                        printer.ImprimirTexto("Consulte o QR Code pelo aplicativo \"De olho na nota\"", CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro);
-                        printer.ImprimirTexto("disponível na AppStore (Apple) e PlayStore (Android)", CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro);
+                        Printer.ImprimirTexto("Consulte o QR Code pelo aplicativo \"De olho na nota\"", CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro);
+                        Printer.ImprimirTexto("disponível na AppStore (Apple) e PlayStore (Android)", CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro);
                     }
                     else
                     {
-                        printer.ImprimirTexto("Consulte o QR Code pelo aplicativo", CmdTamanhoFonte.Condensada);
-                        printer.ImprimirTexto("\"De olho na nota\" disponível na", CmdTamanhoFonte.Condensada);
-                        printer.ImprimirTexto("AppStore (Apple) e PlayStore (Android)", CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirTexto("Consulte o QR Code pelo aplicativo", CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirTexto("\"De olho na nota\" disponível na", CmdTamanhoFonte.Condensada);
+                        Printer.ImprimirTexto("AppStore (Apple) e PlayStore (Android)", CmdTamanhoFonte.Condensada);
                     }
 
                     #endregion App
-
-                    #region Desenvolvedor
-
-                    if (!SoftwareHouse.IsEmpty())
-                    {
-                        printer.PularLinhas(1);
-                        printer.ImprimirTexto(SoftwareHouse, printer.Colunas >= 48 ? CmdAlinhamento.Direita : CmdAlinhamento.Esquerda);
-                        printer.PularLinhas(1);
-                    }
-
-                    #endregion Desenvolvedor
 
                     #endregion Rodape
 
@@ -584,58 +565,58 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     #region Dados do cupom cancelado
 
-                    printer.ImprimirSeparador();
+                    Printer.ImprimirSeparador();
 
                     var cpfCNPJCancelado = cFeCanc.InfCFe.Dest?.CPF.IsEmpty() == false ? cFeCanc.InfCFe.Dest.CPF.FormataCPF() :
                                     cFeCanc.InfCFe.Dest?.CNPJ.IsEmpty() == false ? cFeCanc.InfCFe.Dest.CNPJ.FormataCNPJ() :
                                     "000.000.000-00";
 
-                    if (printer.Colunas >= 48)
-                        printer.ImprimirTexto("DADOS DO CUPOM FISCAL ELETRONICO CANCELADO", CmdAlinhamento.Centro, CmdEstiloFonte.Negrito);
+                    if (Printer.Colunas >= 48)
+                        Printer.ImprimirTexto("DADOS DO CUPOM FISCAL ELETRONICO CANCELADO", CmdAlinhamento.Centro, CmdEstiloFonte.Negrito);
                     else
                     {
-                        printer.ImprimirTexto("DADOS DO CUPOM FISCAL", CmdEstiloFonte.Negrito);
-                        printer.ImprimirTexto("ELETRONICO CANCELADO", CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto("DADOS DO CUPOM FISCAL", CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto("ELETRONICO CANCELADO", CmdEstiloFonte.Negrito);
                     }
 
-                    printer.ImprimirTexto($"CPF/CNPJ do Consumidor: {cpfCNPJCancelado}", CmdTamanhoFonte.Condensada);
-                    printer.ImprimirTexto(AjustarTextoColunas("Valor total:", cFeCanc.InfCFe.Total.VCFe.ToString("C2", cultura), printer.ColunasCondensada), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                    Printer.ImprimirTexto($"CPF/CNPJ do Consumidor: {cpfCNPJCancelado}", CmdTamanhoFonte.Condensada);
+                    Printer.ImprimirTexto(AjustarTextoColunas("Valor total:", cFeCanc.InfCFe.Total.VCFe.ToString("C2", cultura), Printer.ColunasCondensada), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
 
-                    if (printer.Colunas >= 48)
-                        printer.PularLinhas(1);
+                    if (Printer.Colunas >= 48)
+                        Printer.PularLinhas(1);
 
-                    printer.ImprimirTexto($"SAT No. {cFeCanc.InfCFe.Ide.NSerieSAT:D9}", centralizado);
-                    printer.ImprimirTexto($"Data e Hora {cFeCanc.InfCFe.Ide.DEmi:dd/MM/yyyy} {cFeCanc.InfCFe.Ide.HEmi:HH:mm:ss}", centralizado);
+                    Printer.ImprimirTexto($"SAT No. {cFeCanc.InfCFe.Ide.NSerieSAT:D9}", centralizado);
+                    Printer.ImprimirTexto($"Data e Hora {cFeCanc.InfCFe.Ide.DEmi:dd/MM/yyyy} {cFeCanc.InfCFe.Ide.HEmi:HH:mm:ss}", centralizado);
 
                     #region Chave de Acesso
 
-                    if (printer.Colunas >= 48)
-                        printer.PularLinhas(1);
+                    if (Printer.Colunas >= 48)
+                        Printer.PularLinhas(1);
 
                     var chaveCancelado = Regex.Replace(cFeCanc.InfCFe.ChCanc.OnlyNumbers(), ".{4}", "$0 ");
 
-                    if (printer.Colunas >= 48)
-                        printer.ImprimirTexto(chaveCancelado, CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                    if (Printer.Colunas >= 48)
+                        Printer.ImprimirTexto(chaveCancelado, CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
                     else
                     {
-                        printer.ImprimirTexto(chaveCancelado.Substring(0, 24).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
-                        printer.ImprimirTexto(chaveCancelado.Substring(24).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto(chaveCancelado.Substring(0, 24).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto(chaveCancelado.Substring(24).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
                     }
 
-                    if (printer.Colunas >= 48)
+                    if (Printer.Colunas >= 48)
                     {
-                        printer.ImprimirBarcode(cFeCanc.InfCFe.ChCanc.OnlyNumbers().Substring(0, 22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
-                        printer.ImprimirBarcode(cFeCanc.InfCFe.ChCanc.OnlyNumbers().Substring(22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
+                        Printer.ImprimirBarcode(cFeCanc.InfCFe.ChCanc.OnlyNumbers().Substring(0, 22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
+                        Printer.ImprimirBarcode(cFeCanc.InfCFe.ChCanc.OnlyNumbers().Substring(22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
                     }
                     else
                     {
-                        printer.ImprimirBarcode(cFeCanc.InfCFe.ChCanc.OnlyNumbers().Substring(0, 11), CmdBarcode.CODE128c);
-                        printer.ImprimirBarcode(cFeCanc.InfCFe.ChCanc.OnlyNumbers().Substring(11, 11), CmdBarcode.CODE128c);
-                        printer.ImprimirBarcode(cFeCanc.InfCFe.ChCanc.OnlyNumbers().Substring(22, 11), CmdBarcode.CODE128c);
-                        printer.ImprimirBarcode(cFeCanc.InfCFe.ChCanc.OnlyNumbers().Substring(33), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cFeCanc.InfCFe.ChCanc.OnlyNumbers().Substring(0, 11), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cFeCanc.InfCFe.ChCanc.OnlyNumbers().Substring(11, 11), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cFeCanc.InfCFe.ChCanc.OnlyNumbers().Substring(22, 11), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cFeCanc.InfCFe.ChCanc.OnlyNumbers().Substring(33), CmdBarcode.CODE128c);
                     }
 
-                    printer.PularLinhas(1);
+                    Printer.PularLinhas(1);
 
                     #endregion Chave de Acesso
 
@@ -647,10 +628,10 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                                   $"{(cFeCanc.InfCFe.Dest?.CNPJ.IsEmpty() == false ? cFeCanc.InfCFe.Dest.CNPJ : cFeCanc.InfCFe.Dest.CPF)}|" +
                                   $"{cFeCanc.InfCFe.Ide.AssinaturaQrcode}";
 
-                    printer.ImprimirQrCode(qrCodeCancelado, aAlinhamento: centralizado, tamanho: printer.Colunas >= 48 ? QrCodeModSize.Normal : QrCodeModSize.Pequeno);
+                    Printer.ImprimirQrCode(qrCodeCancelado, aAlinhamento: centralizado, tamanho: Printer.Colunas >= 48 ? QrCodeModSize.Normal : QrCodeModSize.Pequeno);
 
-                    if (printer.Colunas >= 48)
-                        printer.PularLinhas(1);
+                    if (Printer.Colunas >= 48)
+                        Printer.PularLinhas(1);
 
                     #endregion QrCode
 
@@ -658,46 +639,46 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     #region Dados do cupom cancelado
 
-                    printer.ImprimirSeparador();
+                    Printer.ImprimirSeparador();
 
-                    if (printer.Colunas >= 48)
-                        printer.ImprimirTexto("DADOS DO CUPOM FISCAL ELETRONICO DE CANCELAMENTO", CmdEstiloFonte.Negrito);
+                    if (Printer.Colunas >= 48)
+                        Printer.ImprimirTexto("DADOS DO CUPOM FISCAL ELETRONICO DE CANCELAMENTO", CmdEstiloFonte.Negrito);
                     else
                     {
-                        printer.ImprimirTexto("DADOS DO CUPOM FISCAL", CmdEstiloFonte.Negrito);
-                        printer.ImprimirTexto("ELETRONICO DE CANCELAMENTO", CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto("DADOS DO CUPOM FISCAL", CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto("ELETRONICO DE CANCELAMENTO", CmdEstiloFonte.Negrito);
                     }
 
-                    printer.ImprimirTexto($"SAT No. {cFeCanc.InfCFe.Ide.NSerieSAT:D9}", centralizado);
-                    printer.ImprimirTexto($"Data e Hora {cFeCanc.InfCFe.Ide.DEmi:dd/MM/yyyy} {cFeCanc.InfCFe.Ide.HEmi:HH:mm:ss}", centralizado);
+                    Printer.ImprimirTexto($"SAT No. {cFeCanc.InfCFe.Ide.NSerieSAT:D9}", centralizado);
+                    Printer.ImprimirTexto($"Data e Hora {cFeCanc.InfCFe.Ide.DEmi:dd/MM/yyyy} {cFeCanc.InfCFe.Ide.HEmi:HH:mm:ss}", centralizado);
 
                     #region Chave de Acesso
 
                     var chaveCancelada2 = Regex.Replace(cFeCanc.InfCFe.Id.OnlyNumbers(), ".{4}", "$0 ");
 
-                    if (printer.Colunas >= 48)
-                        printer.ImprimirTexto(chaveCancelada2, CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro, CmdEstiloFonte.Negrito);
+                    if (Printer.Colunas >= 48)
+                        Printer.ImprimirTexto(chaveCancelada2, CmdTamanhoFonte.Condensada, CmdAlinhamento.Centro, CmdEstiloFonte.Negrito);
                     else
                     {
-                        printer.ImprimirTexto(chaveCancelada2.Substring(0, 22).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
-                        printer.ImprimirTexto(chaveCancelada2.Substring(22).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto(chaveCancelada2.Substring(0, 22).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
+                        Printer.ImprimirTexto(chaveCancelada2.Substring(22).Trim(), CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
                     }
 
-                    if (printer.Colunas >= 48)
+                    if (Printer.Colunas >= 48)
                     {
-                        printer.ImprimirBarcode(cFeCanc.InfCFe.Id.OnlyNumbers().Substring(0, 22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
-                        printer.ImprimirBarcode(cFeCanc.InfCFe.Id.OnlyNumbers().Substring(22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
+                        Printer.ImprimirBarcode(cFeCanc.InfCFe.Id.OnlyNumbers().Substring(0, 22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
+                        Printer.ImprimirBarcode(cFeCanc.InfCFe.Id.OnlyNumbers().Substring(22), CmdBarcode.CODE128c, CmdAlinhamento.Centro);
                     }
                     else
                     {
-                        printer.ImprimirBarcode(cFeCanc.InfCFe.Id.OnlyNumbers().Substring(0, 11), CmdBarcode.CODE128c);
-                        printer.ImprimirBarcode(cFeCanc.InfCFe.Id.OnlyNumbers().Substring(11, 11), CmdBarcode.CODE128c);
-                        printer.ImprimirBarcode(cFeCanc.InfCFe.Id.OnlyNumbers().Substring(22, 11), CmdBarcode.CODE128c);
-                        printer.ImprimirBarcode(cFeCanc.InfCFe.Id.OnlyNumbers().Substring(33), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cFeCanc.InfCFe.Id.OnlyNumbers().Substring(0, 11), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cFeCanc.InfCFe.Id.OnlyNumbers().Substring(11, 11), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cFeCanc.InfCFe.Id.OnlyNumbers().Substring(22, 11), CmdBarcode.CODE128c);
+                        Printer.ImprimirBarcode(cFeCanc.InfCFe.Id.OnlyNumbers().Substring(33), CmdBarcode.CODE128c);
                     }
 
-                    if (printer.Colunas >= 48)
-                        printer.PularLinhas(1);
+                    if (Printer.Colunas >= 48)
+                        Printer.PularLinhas(1);
 
                     #endregion Chave de Acesso
 
@@ -709,25 +690,13 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                                         $"{(cFeCanc.InfCFe.Dest?.CNPJ.IsEmpty() == false ? cFeCanc.InfCFe.Dest.CNPJ : cFeCanc.InfCFe.Dest.CPF)}|" +
                                         $"{cFeCanc.InfCFe.Ide.AssinaturaQrcode}";
 
-                    printer.ImprimirQrCode(qrCodeCancelado2, aAlinhamento: centralizado, tamanho: printer.Colunas >= 48 ? QrCodeModSize.Normal : QrCodeModSize.Pequeno);
+                    Printer.ImprimirQrCode(qrCodeCancelado2, aAlinhamento: centralizado, tamanho: Printer.Colunas >= 48 ? QrCodeModSize.Normal : QrCodeModSize.Pequeno);
 
-                    printer.PularLinhas(1);
+                    Printer.PularLinhas(1);
 
                     #endregion QrCode
 
                     #endregion Dados do cupom cancelado
-
-                    printer.ImprimirSeparador();
-
-                    #region Desenvolvedor
-
-                    if (!SoftwareHouse.IsEmpty())
-                    {
-                        printer.ImprimirTexto(SoftwareHouse, printer.Colunas >= 48 ? CmdAlinhamento.Direita : CmdAlinhamento.Esquerda);
-                        printer.PularLinhas(1);
-                    }
-
-                    #endregion Desenvolvedor
 
                     break;
 
@@ -735,8 +704,20 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                     throw new ArgumentOutOfRangeException(nameof(tipo), tipo, null);
             }
 
+            #region Desenvolvedor
+
+            if (!SoftwareHouse.IsEmpty())
+            {
+                Printer.ImprimirTexto(SoftwareHouse, Printer.Colunas >= 48 ? CmdAlinhamento.Direita : CmdAlinhamento.Esquerda);
+                Printer.PularLinhas(1);
+            }
+
+            #endregion Desenvolvedor
+
             if (CortarPapel)
-                printer.CortarPapel(true);
+                Printer.CortarPapel(true);
+
+            Printer.Imprimir(NumeroCopias);
         }
 
         private static string AjustarTextoColunas(string textoE, string textoR, int colunas)

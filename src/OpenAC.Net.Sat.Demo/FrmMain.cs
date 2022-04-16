@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Printing;
 using System.IO;
+using System.IO.Ports;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using OpenAC.Net.Sat.Extrato.FastReport.OpenSource;
@@ -10,8 +13,14 @@ using NLog.Config;
 using NLog.Targets;
 using NLog.Windows.Forms;
 using OpenAC.Net.Core.Extensions;
+using OpenAC.Net.Devices;
 using OpenAC.Net.DFe.Core.Common;
+using OpenAC.Net.EscPos;
+using OpenAC.Net.EscPos.Commom;
+using OpenAC.Net.EscPos.Extensions;
 using OpenAC.Net.Integrador;
+using OpenAC.Net.Sat.Demo.Commom;
+using OpenAC.Net.Sat.Extrato.EscPos;
 
 namespace OpenAC.Net.Sat.Demo
 {
@@ -24,9 +33,10 @@ namespace OpenAC.Net.Sat.Demo
         private CFeCanc cfeCancAtual;
         private SatRede redeAtual;
         private readonly OpenConfig config;
-        private OpenSat acbrSat;
+        private OpenSat openSat;
         private ExtratoFastOpen extrato;
-        private OpenIntegrador acbrIntegrador;
+        private ExtratoEscPos escpos;
+        private OpenIntegrador openIntegrador;
 
         #endregion Fields
 
@@ -35,6 +45,13 @@ namespace OpenAC.Net.Sat.Demo
         public FrmMain()
         {
             InitializeComponent();
+
+            // .Net 5 e 6 não tem todos os CodePages.
+            // Então tem que instalar o pacote System.Text.Encoding.CodePages.
+            // Adiciona esta linha ao programa antes de usar o EscPos.
+            // Isso so precisa ser feito 1 vez então faça na inialização do seu programa.
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             config = OpenConfig.CreateOrLoad(Path.Combine(Application.StartupPath, "sat.config"));
         }
 
@@ -50,16 +67,33 @@ namespace OpenAC.Net.Sat.Demo
 
         private void Initialize()
         {
-            acbrIntegrador = new OpenIntegrador();
-            acbrSat = new OpenSat();
+            openIntegrador = new OpenIntegrador();
+            openSat = new OpenSat();
             extrato = new ExtratoFastOpen();
 
-            cmbAmbiente.EnumDataSource<DFeTipoAmbiente>(DFeTipoAmbiente.Homologacao);
-            cmbModeloSat.EnumDataSource<ModeloSat>(ModeloSat.StdCall);
-            cmbEmiRegTrib.EnumDataSource<RegTrib>(RegTrib.Normal);
-            cmbEmiRegTribISSQN.EnumDataSource<RegTribIssqn>(RegTribIssqn.Nenhum);
-            cmbEmiRatIISQN.EnumDataSource<RatIssqn>(RatIssqn.Nao);
-            cmbFiltro.EnumDataSource<FiltroDFeReport>(FiltroDFeReport.Nenhum);
+            escpos = new ExtratoEscPos();
+
+            cmbAmbiente.EnumDataSource(DFeTipoAmbiente.Homologacao);
+            cmbModeloSat.EnumDataSource(ModeloSat.StdCall);
+            cmbEmiRegTrib.EnumDataSource(RegTrib.Normal);
+            cmbEmiRegTribISSQN.EnumDataSource(RegTribIssqn.Nenhum);
+            cmbEmiRatIISQN.EnumDataSource(RatIssqn.Nao);
+            cmbFiltro.EnumDataSource(FiltroDFeReport.Nenhum);
+            cmbExtrato.EnumDataSource(TipoExtrato.FastReport);
+
+            //EscPos
+            cbbConexao.EnumDataSource(TipoConexao.Serial);
+            cbbProtocolo.EnumDataSource(ProtocoloEscPos.EscPos);
+            cbbEnconding.EnumDataSource(PaginaCodigo.pc850);
+            cbbPortas.SetDataSource(SerialPort.GetPortNames());
+            cbbImpressoras.SetDataSource(PrinterSettings.InstalledPrinters.Cast<string>().ToArray());
+            cbbVelocidade.EnumDataSource(SerialBaud.Bd9600);
+            cbbDataBits.EnumDataSource(SerialDataBits.Db8);
+            cbbParity.EnumDataSource(Parity.None);
+            cbbStopBits.EnumDataSource(StopBits.None);
+            cbbHandshake.EnumDataSource(Handshake.None);
+
+            tbcDeviceConfig.HideTabHeaders();
         }
 
         private void InitializeLog()
@@ -102,7 +136,7 @@ namespace OpenAC.Net.Sat.Demo
             logger.Info("Gerando CFe");
 
             var totalGeral = 0M;
-            cfeAtual = acbrSat.NewCFe();
+            cfeAtual = openSat.NewCFe();
             cfeAtual.InfCFe.Ide.NumeroCaixa = 1;
             cfeAtual.InfCFe.Dest.CPF = "";
             cfeAtual.InfCFe.Dest.Nome = "CONSUMIDOR";
@@ -186,25 +220,25 @@ namespace OpenAC.Net.Sat.Demo
 
         private void ToogleInitialize()
         {
-            if (acbrSat.Ativo)
+            if (openSat.Ativo)
             {
-                acbrSat.Desativar();
+                openSat.Desativar();
                 btnIniDesini.Text = @"Inicializar";
             }
             else
             {
-                acbrSat.Ativar();
+                openSat.Ativar();
                 btnIniDesini.Text = @"Desinicializar";
             }
         }
 
         private void LoadConfig()
         {
-            if (acbrSat.Ativo) ToogleInitialize();
+            if (openSat.Ativo) ToogleInitialize();
 
-            cmbModeloSat.SelectedItem = config.Get("ModeloSat", ModeloSat.Cdecl);
+            cmbModeloSat.SetSelectedValue(config.Get("ModeloSat", ModeloSat.Cdecl));
             txtDllPath.Text = config.Get("DllPath", @"C:\SAT\SAT.dll");
-            cmbAmbiente.SelectedItem = config.Get("Ambiente", DFeTipoAmbiente.Homologacao);
+            cmbAmbiente.SetSelectedValue(config.Get("Ambiente", DFeTipoAmbiente.Homologacao));
             txtAtivacao.Text = config.Get("Ativacao", "12345678");
             txtCodUF.Text = config.Get("CodUF", "35");
             nunPaginaCodigo.Value = config.Get("PaginaCodigo", 1252M);
@@ -223,9 +257,9 @@ namespace OpenAC.Net.Sat.Demo
             txtEmitCNPJ.Text = config.Get("EmitCNPJ", "11111111111111");
             txtEmitIE.Text = config.Get("EmitIE", string.Empty);
             txtEmitIM.Text = config.Get("EmitIM", string.Empty);
-            cmbEmiRegTrib.SelectedItem = config.Get("EmiRegTrib", RegTrib.SimplesNacional);
-            cmbEmiRegTribISSQN.SelectedItem = config.Get("EmiRegTribISSQN", RegTribIssqn.Nenhum);
-            cmbEmiRegTrib.SelectedItem = config.Get("EmiRatIISQN", RatIssqn.Sim);
+            cmbEmiRegTrib.SetSelectedValue(config.Get("EmiRegTrib", RegTrib.SimplesNacional));
+            cmbEmiRegTribISSQN.SetSelectedValue(config.Get("EmiRegTribISSQN", RegTribIssqn.Nenhum));
+            cmbEmiRatIISQN.SetSelectedValue(config.Get("EmiRatIISQN", RatIssqn.Sim));
             txtIdeCNPJ.Text = config.Get("IdeCNPJ", "22222222222222");
             txtSignAC.Text = config.Get("SignAC", "1111111111111222222222222221111111111111122222222222222111111111111112222222222222211111" +
                                                   "111111111222222222222221111111111111122222222222222111111111111112222222222222211111111" +
@@ -255,18 +289,45 @@ namespace OpenAC.Net.Sat.Demo
 
             chkPreview.Checked = config.Get("ExtratoPreview", false);
             chkSetup.Checked = config.Get("ExtratoSetup", false);
-            cmbFiltro.SelectedItem = config.Get("ExtratoFiltro", FiltroDFeReport.Nenhum);
+            cmbFiltro.SetSelectedValue(config.Get("ExtratoFiltro", FiltroDFeReport.Nenhum));
             txtExportacao.Text = config.Get("ExtratoFiltroArquivo", string.Empty);
             nudEspacoFinal.Value = config.Get("ExtratoEspacoFinal", 0M);
+            cmbExtrato.SetSelectedValue(config.Get("ExtratoTipo", TipoExtrato.FastReport));
+
+            //EscPos
+            cbbProtocolo.SetSelectedValue(config.Get("ProtocoloEscPos", ProtocoloEscPos.EscPos));
+            cbbConexao.SetSelectedValue(config.Get("TipoConexao", TipoConexao.Serial));
+            cbbEnconding.SetSelectedValue(config.Get("PaginaCodigo", PaginaCodigo.pc850));
+            chkControlePortas.Checked = config.Get("ControlePorta", true);
+            nudEspacos.Value = config.Get("EspacoEntreLinhas", 0M);
+            nudLinhas.Value = config.Get("LinhasEntreCupom", 0M);
+
+            //Serial
+            cbbPortas.SetSelectedValue(config.Get("SerialPorta", cbbPortas.GetSelectedValue<string>()));
+            cbbVelocidade.SetSelectedValue(config.Get("SerialVelocidade", SerialBaud.Bd9600));
+            cbbDataBits.SetSelectedValue(config.Get("SerialDataBits", SerialDataBits.Db8));
+            cbbParity.SetSelectedValue(config.Get("SerialParaty", Parity.None));
+            cbbStopBits.SetSelectedValue(config.Get("SerialStopBits", StopBits.None));
+            cbbHandshake.SetSelectedValue(config.Get("SerialHandhsake", Handshake.None));
+
+            //TCP
+            txtIP.Text = config.Get("TCPIP", "");
+            nudPorta.Value = config.Get("TCPPorta", 9100M);
+
+            //Raw
+            cbbImpressoras.SetSelectedValue(config.Get("RawImpressora", cbbImpressoras.GetSelectedValue<string>()));
+
+            //File
+            txtArquivo.Text = config.Get("FileArquivo", "");
 
             MessageBox.Show(this, @"Configurações Carregada com sucesso !", @"S@T Demo");
         }
 
         private void SaveConfig(bool msg = true)
         {
-            config.Set("ModeloSat", cmbModeloSat.SelectedItem);
+            config.Set("ModeloSat", cmbModeloSat.GetSelectedValue<ModeloSat>());
             config.Set("DllPath", txtDllPath.Text);
-            config.Set("Ambiente", cmbAmbiente.SelectedItem);
+            config.Set("Ambiente", cmbAmbiente.GetSelectedValue<DFeTipoAmbiente>());
             config.Set("Ativacao", txtAtivacao.Text);
             config.Set("CodUF", txtCodUF.Text);
             config.Set("PaginaCodigo", nunPaginaCodigo.Value);
@@ -282,9 +343,9 @@ namespace OpenAC.Net.Sat.Demo
             config.Set("EmitCNPJ", txtEmitCNPJ.Text);
             config.Set("EmitIE", txtEmitIE.Text);
             config.Set("EmitIM", txtEmitIM.Text);
-            config.Set("EmiRegTrib", cmbEmiRegTrib.SelectedItem);
-            config.Set("EmiRegTribISSQN", cmbEmiRegTribISSQN.SelectedItem);
-            config.Set("EmiRatIISQN", cmbEmiRatIISQN.SelectedItem);
+            config.Set("EmiRegTrib", cmbEmiRegTrib.GetSelectedValue<RegTrib>());
+            config.Set("EmiRegTribISSQN", cmbEmiRegTribISSQN.GetSelectedValue<RegTribIssqn>());
+            config.Set("EmiRatIISQN", cmbEmiRatIISQN.GetSelectedValue<RatIssqn>());
             config.Set("IdeCNPJ", txtIdeCNPJ.Text);
             config.Set("SignAC", txtSignAC.Text);
             config.Set("MFePathEnvio", txtMFeEnvio.Text);
@@ -293,12 +354,39 @@ namespace OpenAC.Net.Sat.Demo
             config.Set("ChaveAcessoValidador", txtChaveAcessoValidador.Text);
 
             //Extrato
-            config.Set("ExtratoLogo", pctLogo.Image.ToBase64());
+            config.Set("ExtratoLogo", Helpers.ToBase64(pctLogo.Image));
             config.Set("ExtratoPreview", chkPreview.Checked);
             config.Set("ExtratoSetup", chkSetup.Checked);
-            config.Set("ExtratoFiltro", cmbFiltro.SelectedItem);
+            config.Set("ExtratoFiltro", cmbFiltro.GetSelectedValue<FiltroDFeReport>());
             config.Set("ExtratoFiltroArquivo", txtExportacao.Text);
             config.Set("ExtratoEspacoFinal", nudEspacoFinal.Value);
+            config.Set("ExtratoTipo", cmbExtrato.GetSelectedValue<TipoExtrato>());
+
+            //EscPos
+            config.Set("ProtocoloEscPos", cbbProtocolo.GetSelectedValue<ProtocoloEscPos>());
+            config.Set("TipoConexao", cbbConexao.GetSelectedValue<TipoConexao>());
+            config.Set("PaginaCodigo", cbbEnconding.GetSelectedValue<PaginaCodigo>());
+            config.Set("ControlePorta", chkControlePortas.Checked);
+            config.Set("EspacoEntreLinhas", nudEspacos.Value);
+            config.Set("LinhasEntreCupom", nudLinhas.Value);
+
+            //Serial
+            config.Set("SerialPorta", cbbPortas.GetSelectedValue<string>());
+            config.Set("SerialVelocidade", cbbVelocidade.GetSelectedValue<SerialBaud>());
+            config.Set("SerialDataBits", cbbDataBits.GetSelectedValue<SerialDataBits>());
+            config.Set("SerialParaty", cbbParity.GetSelectedValue<Parity>());
+            config.Set("SerialStopBits", cbbStopBits.GetSelectedValue<StopBits>());
+            config.Set("SerialHandhsake", cbbHandshake.GetSelectedValue<Handshake>());
+
+            //TCP
+            config.Set("TCPIP", txtIP.Text);
+            config.Set("TCPPorta", nudPorta.Value);
+
+            //Raw
+            config.Set("RawImpressora", cbbImpressoras.GetSelectedValue<string>());
+
+            //File
+            config.Set("FileArquivo", txtArquivo.Text);
 
             config.Save();
 
@@ -308,7 +396,7 @@ namespace OpenAC.Net.Sat.Demo
 
         private void ConsultarStatusOperacional()
         {
-            var ret = acbrSat.ConsultarStatusOperacional();
+            var ret = openSat.ConsultarStatusOperacional();
             logger.Info($"NSERIE.........: {ret.Status.NSerie}");
             logger.Info($"LAN_MAC........: {ret.Status.LanMac}");
             logger.Info($"STATUS_LAN.....: {ret.Status.StatusLan}");
@@ -327,6 +415,59 @@ namespace OpenAC.Net.Sat.Demo
             logger.Info($"ESTADO_OPERACAO: {ret.Status.EstadoOperacao}");
         }
 
+        private EscPosPrinter GetPosPrinter()
+        {
+            var tipo = cbbConexao.GetSelectedValue<TipoConexao>();
+
+            EscPosPrinter ret = tipo switch
+            {
+                TipoConexao.Serial => new EscPosPrinter<SerialConfig>()
+                {
+                    Device =
+                    {
+                        Porta = cbbPortas.GetSelectedValue<string>(),
+                        Baud = (int)cbbVelocidade.GetSelectedValue<SerialBaud>(),
+                        DataBits = (int)cbbDataBits.GetSelectedValue<SerialDataBits>(),
+                        Parity = cbbParity.GetSelectedValue<Parity>(),
+                        StopBits = cbbStopBits.GetSelectedValue<StopBits>(),
+                        Handshake = cbbHandshake.GetSelectedValue<Handshake>(),
+                    }
+                },
+                TipoConexao.TCP => new EscPosPrinter<TCPConfig>()
+                {
+                    Device =
+                    {
+                        IP = txtIP.Text,
+                        Porta = (int)nudPorta.Value
+                    }
+                },
+                TipoConexao.RAW => new EscPosPrinter<RawConfig>()
+                {
+                    Device =
+                    {
+                        Impressora = cbbImpressoras.GetSelectedValue<string>(),
+                    }
+                },
+                TipoConexao.File => new EscPosPrinter<FileConfig>()
+                {
+                    Device =
+                    {
+                        CreateIfNotExits = true,
+                        File = txtArquivo.Text,
+                    }
+                },
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+            ret.Protocolo = cbbProtocolo.GetSelectedValue<ProtocoloEscPos>();
+            ret.PaginaCodigo = cbbEnconding.GetSelectedValue<PaginaCodigo>();
+            ret.Device.ControlePorta = chkControlePortas.Checked;
+            ret.EspacoEntreLinhas = (byte)nudEspacos.Value;
+            ret.LinhasEntreCupons = (byte)nudLinhas.Value;
+
+            return ret;
+        }
+
         #endregion Methods
 
         #region EventHandlers
@@ -335,13 +476,13 @@ namespace OpenAC.Net.Sat.Demo
 
         private void ativarSATToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
-            acbrSat.AtivarSAT(1, txtEmitCNPJ.Text, txtCodUF.Text.ToInt32());
+            if (!openSat.Ativo) ToogleInitialize();
+            openSat.AtivarSAT(1, txtEmitCNPJ.Text, txtCodUF.Text.ToInt32());
         }
 
         private void comunicarCertificadoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
+            if (!openSat.Ativo) ToogleInitialize();
             logger.Info("Comunicar certificado.");
             var file = Helpers.OpenFile(@"Certificado|*.cer|Arquivo Texto|*.txt");
             if (file.IsEmpty())
@@ -350,30 +491,30 @@ namespace OpenAC.Net.Sat.Demo
                 return;
             }
 
-            acbrSat.ComunicarCertificadoIcpBrasil(File.ReadAllText(file));
+            openSat.ComunicarCertificadoIcpBrasil(File.ReadAllText(file));
         }
 
         private void associarAssinaturaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
-            acbrSat.AssociarAssinatura(txtIdeCNPJ.Text + txtEmitCNPJ.Text, txtSignAC.Text);
+            if (!openSat.Ativo) ToogleInitialize();
+            openSat.AssociarAssinatura(txtIdeCNPJ.Text + txtEmitCNPJ.Text, txtSignAC.Text);
         }
 
         private void bloquearSATToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
-            acbrSat.BloquearSAT();
+            if (!openSat.Ativo) ToogleInitialize();
+            openSat.BloquearSAT();
         }
 
         private void desbloquearSATToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
-            acbrSat.DesbloquearSAT();
+            if (!openSat.Ativo) ToogleInitialize();
+            openSat.DesbloquearSAT();
         }
 
         private void trocarCódigoDeAtivaçãoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
+            if (!openSat.Ativo) ToogleInitialize();
 
             var codigo = txtAtivacao.Text;
             if (InputBox.Show("Trocar Código de Ativação", "Entre com o Código de Ativação ou de Emergência:", ref codigo).Equals(DialogResult.Cancel))
@@ -390,7 +531,7 @@ namespace OpenAC.Net.Sat.Demo
             if (InputBox.Show("Trocar Código de Ativação", "Entre com o Número do Novo Código de Ativação:", ref novoCodigo).Equals(DialogResult.Cancel))
                 return;
 
-            var ret = acbrSat.TrocarCodigoDeAtivacao(codigo, tipoCodigo.ToInt32(1), novoCodigo);
+            var ret = openSat.TrocarCodigoDeAtivacao(codigo, tipoCodigo.ToInt32(1), novoCodigo);
             if (ret.CodigoDeRetorno != 1800)
                 return;
 
@@ -406,8 +547,8 @@ namespace OpenAC.Net.Sat.Demo
 
         private void enviarVendaToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
-            var ret = acbrSat.EnviarDadosVenda(cfeAtual);
+            if (!openSat.Ativo) ToogleInitialize();
+            var ret = openSat.EnviarDadosVenda(cfeAtual);
             if (ret.CodigoDeRetorno != 6000)
                 return;
 
@@ -419,12 +560,30 @@ namespace OpenAC.Net.Sat.Demo
         private void imprimirExtratoVendaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (cfeAtual.IsNull()) return;
-            if (extrato.Filtro != FiltroDFeReport.Nenhum && extrato.NomeArquivo.IsEmpty()) return; ;
+            var tipo = cmbExtrato.GetSelectedValue<TipoExtrato>();
+            switch (tipo)
+            {
+                case TipoExtrato.FastReport:
+                    if (extrato.Filtro != FiltroDFeReport.Nenhum && extrato.NomeArquivo.IsEmpty()) return;
+                    extrato.ImprimirExtrato(cfeAtual);
 
-            extrato.ImprimirExtrato(cfeAtual);
+                    if (extrato.Filtro == FiltroDFeReport.Nenhum) return;
+                    MessageBox.Show(this, @"Extrato impresso com sucesso !", @"S@T Demo");
+                    break;
 
-            if (extrato.Filtro == FiltroDFeReport.Nenhum) return;
-            MessageBox.Show(this, @"Extrato impresso com sucesso !", @"S@T Demo");
+                case TipoExtrato.EscPos:
+                    using (var posprinter = GetPosPrinter())
+                    {
+                        if (pctLogo.Image != null)
+                            escpos.Logo = pctLogo.Image.ResizeImage(300, 300);
+                        escpos.Printer = posprinter;
+                        escpos.ImprimirExtrato(cfeAtual);
+                    }
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void imprimirExtratoVendaResumidoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -472,8 +631,8 @@ namespace OpenAC.Net.Sat.Demo
 
         private void enviarCancelamentoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
-            var ret = cfeCancAtual != null ? acbrSat.CancelarUltimaVenda(cfeCancAtual) : acbrSat.CancelarUltimaVenda(cfeAtual);
+            if (!openSat.Ativo) ToogleInitialize();
+            var ret = cfeCancAtual != null ? openSat.CancelarUltimaVenda(cfeCancAtual) : openSat.CancelarUltimaVenda(cfeAtual);
             if (ret.CodigoDeRetorno != 7000)
                 return;
 
@@ -490,19 +649,19 @@ namespace OpenAC.Net.Sat.Demo
 
         private void consultarStatusOperacionalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
+            if (!openSat.Ativo) ToogleInitialize();
             ConsultarStatusOperacional();
         }
 
         private void consultarSATToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
-            acbrSat.ConsultarSAT();
+            if (!openSat.Ativo) ToogleInitialize();
+            openSat.ConsultarSAT();
         }
 
         private void consultarNumeroDeSessãoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
+            if (!openSat.Ativo) ToogleInitialize();
 
             var sessao = string.Empty;
             if (InputBox.Show("Consultar Sessão", "Digite o número da sessão", ref sessao).Equals(DialogResult.Cancel))
@@ -511,22 +670,29 @@ namespace OpenAC.Net.Sat.Demo
             if (!sessao.IsNumeric())
                 return;
 
-            var ret = acbrSat.ConsultarNumeroSessao(sessao.ToInt32());
+            var ret = openSat.ConsultarNumeroSessao(sessao.ToInt32());
 
-            if (ret.CodigoDeRetorno == 6000)
-                wbrXmlRecebido.LoadXml(ret.Venda.GetXml());
-            else if (ret.CodigoDeRetorno == 7000)
-                wbrXmlRecebido.LoadXml(ret.Cancelamento.GetXml());
-            else
-                return;
+            switch (ret.CodigoDeRetorno)
+            {
+                case 6000:
+                    wbrXmlRecebido.LoadXml(ret.Venda.GetXml());
+                    break;
+
+                case 7000:
+                    wbrXmlRecebido.LoadXml(ret.Cancelamento.GetXml());
+                    break;
+
+                default:
+                    return;
+            }
 
             tbcXml.SelectedTab = tpgXmlRecebido;
         }
 
         private void atualizarSATToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
-            acbrSat.AtualizarSoftwareSAT();
+            if (!openSat.Ativo) ToogleInitialize();
+            openSat.AtualizarSoftwareSAT();
         }
 
         private void lerXMLConfiguraçãoDeInterfaceDeRedeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -555,12 +721,12 @@ namespace OpenAC.Net.Sat.Demo
 
         private void testeFimAFimToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
+            if (!openSat.Ativo) ToogleInitialize();
 
             if (cfeAtual == null)
                 GerarCFe();
 
-            var ret = acbrSat.TesteFimAFim(cfeAtual);
+            var ret = openSat.TesteFimAFim(cfeAtual);
             if (ret.CodigoDeRetorno != 9000)
                 return;
 
@@ -570,8 +736,8 @@ namespace OpenAC.Net.Sat.Demo
 
         private void extrairLogsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!acbrSat.Ativo) ToogleInitialize();
-            var resposta = acbrSat.ExtrairLogs();
+            if (!openSat.Ativo) ToogleInitialize();
+            var resposta = openSat.ExtrairLogs();
             var pathLog = Path.Combine(Application.StartupPath, "logSat.txt");
             File.WriteAllText(pathLog, resposta.Log);
             Process.Start(pathLog);
@@ -583,7 +749,7 @@ namespace OpenAC.Net.Sat.Demo
 
         private void cmbModeloSat_SelectedIndexChanged(object sender, EventArgs e)
         {
-            acbrSat.Modelo = (ModeloSat)cmbModeloSat.SelectedItem;
+            openSat.Modelo = cmbModeloSat.GetSelectedValue<ModeloSat>();
         }
 
         private void txtDllPath_TextChanged(object sender, EventArgs e)
@@ -591,24 +757,24 @@ namespace OpenAC.Net.Sat.Demo
             if (!File.Exists(txtDllPath.Text))
                 return;
 
-            acbrSat.PathDll = txtDllPath.Text;
+            openSat.PathDll = txtDllPath.Text;
         }
 
         private void txtAtivacao_TextChanged(object sender, EventArgs e)
         {
             if (txtAtivacao.Text.IsEmpty()) return;
 
-            acbrSat.CodigoAtivacao = txtAtivacao.Text;
+            openSat.CodigoAtivacao = txtAtivacao.Text;
         }
 
         private void cmbAmbiente_SelectedIndexChanged(object sender, EventArgs e)
         {
-            acbrSat.Configuracoes.IdeTpAmb = (DFeTipoAmbiente)cmbAmbiente.SelectedItem;
+            openSat.Configuracoes.IdeTpAmb = cmbAmbiente.GetSelectedValue<DFeTipoAmbiente>();
         }
 
         private void nunCaixa_ValueChanged(object sender, EventArgs e)
         {
-            acbrSat.Configuracoes.IdeNumeroCaixa = (int)nunCaixa.Value;
+            openSat.Configuracoes.IdeNumeroCaixa = (int)nunCaixa.Value;
         }
 
         private void nunPaginaCodigo_ValueChanged(object sender, EventArgs e)
@@ -616,7 +782,7 @@ namespace OpenAC.Net.Sat.Demo
             try
             {
                 var encoder = Encoding.GetEncoding((int)nunPaginaCodigo.Value);
-                acbrSat.Encoding = encoder;
+                openSat.Encoding = encoder;
             }
             catch (Exception ex)
             {
@@ -624,7 +790,7 @@ namespace OpenAC.Net.Sat.Demo
                 nunPaginaCodigo.ValueChanged -= nunPaginaCodigo_ValueChanged;
 
                 nunPaginaCodigo.Value = 65001M;
-                acbrSat.Encoding = Encoding.UTF8;
+                openSat.Encoding = Encoding.UTF8;
 
                 nunPaginaCodigo.ValueChanged += nunPaginaCodigo_ValueChanged;
             }
@@ -637,97 +803,97 @@ namespace OpenAC.Net.Sat.Demo
 
         private void chkRemoveAcentos_CheckedChanged(object sender, EventArgs e)
         {
-            acbrSat.Configuracoes.RemoverAcentos = chkRemoveAcentos.Checked;
+            openSat.Configuracoes.RemoverAcentos = chkRemoveAcentos.Checked;
         }
 
         private void nunVersaoCFe_ValueChanged(object sender, EventArgs e)
         {
-            acbrSat.Configuracoes.InfCFeVersaoDadosEnt = nunVersaoCFe.Value;
+            openSat.Configuracoes.InfCFeVersaoDadosEnt = nunVersaoCFe.Value;
         }
 
         private void chkSaveCFe_CheckedChanged(object sender, EventArgs e)
         {
-            acbrSat.Arquivos.SalvarCFe = chkSaveCFe.Checked;
+            openSat.Arquivos.SalvarCFe = chkSaveCFe.Checked;
         }
 
         private void chkSaveEnvio_CheckedChanged(object sender, EventArgs e)
         {
-            acbrSat.Arquivos.SalvarEnvio = chkSaveEnvio.Checked;
+            openSat.Arquivos.SalvarEnvio = chkSaveEnvio.Checked;
         }
 
         private void chkSaveCFeCanc_CheckedChanged(object sender, EventArgs e)
         {
-            acbrSat.Arquivos.SalvarCFeCanc = chkSaveCFeCanc.Checked;
+            openSat.Arquivos.SalvarCFeCanc = chkSaveCFeCanc.Checked;
         }
 
         private void chkSepararCNPJ_CheckedChanged(object sender, EventArgs e)
         {
-            acbrSat.Arquivos.SepararPorCNPJ = chkSepararCNPJ.Checked;
+            openSat.Arquivos.SepararPorCNPJ = chkSepararCNPJ.Checked;
         }
 
         private void chkSepararData_CheckedChanged(object sender, EventArgs e)
         {
-            acbrSat.Arquivos.SepararPorMes = chkSepararData.Checked;
+            openSat.Arquivos.SepararPorMes = chkSepararData.Checked;
         }
 
         private void txtEmitCNPJ_TextChanged(object sender, EventArgs e)
         {
-            acbrSat.Configuracoes.EmitCNPJ = txtEmitCNPJ.Text.OnlyNumbers();
+            openSat.Configuracoes.EmitCNPJ = txtEmitCNPJ.Text.OnlyNumbers();
         }
 
         private void txtEmitIE_TextChanged(object sender, EventArgs e)
         {
-            acbrSat.Configuracoes.EmitIE = txtEmitIE.Text.OnlyNumbers();
+            openSat.Configuracoes.EmitIE = txtEmitIE.Text.OnlyNumbers();
         }
 
         private void txtEmitIM_TextChanged(object sender, EventArgs e)
         {
-            acbrSat.Configuracoes.EmitIM = txtEmitIM.Text.OnlyNumbers();
+            openSat.Configuracoes.EmitIM = txtEmitIM.Text.OnlyNumbers();
         }
 
         private void cmbEmiRegTrib_SelectedIndexChanged(object sender, EventArgs e)
         {
-            acbrSat.Configuracoes.EmitCRegTrib = (RegTrib)cmbEmiRegTrib.SelectedItem;
+            openSat.Configuracoes.EmitCRegTrib = cmbEmiRegTrib.GetSelectedValue<RegTrib>();
         }
 
         private void cmbEmiRegTribISSQN_SelectedIndexChanged(object sender, EventArgs e)
         {
-            acbrSat.Configuracoes.EmitCRegTribISSQN = (RegTribIssqn)cmbEmiRegTribISSQN.SelectedItem;
+            openSat.Configuracoes.EmitCRegTribISSQN = cmbEmiRegTribISSQN.GetSelectedValue<RegTribIssqn>();
         }
 
         private void cmbEmiRatIISQN_SelectedIndexChanged(object sender, EventArgs e)
         {
-            acbrSat.Configuracoes.EmitIndRatISSQN = (RatIssqn)cmbEmiRatIISQN.SelectedItem;
+            openSat.Configuracoes.EmitIndRatISSQN = cmbEmiRatIISQN.GetSelectedValue<RatIssqn>();
         }
 
         private void txtIdeCNPJ_TextChanged(object sender, EventArgs e)
         {
-            acbrSat.Configuracoes.IdeCNPJ = txtIdeCNPJ.Text.OnlyNumbers();
+            openSat.Configuracoes.IdeCNPJ = txtIdeCNPJ.Text.OnlyNumbers();
         }
 
         private void txtSignAC_TextChanged(object sender, EventArgs e)
         {
-            acbrSat.SignAC = txtSignAC.Text;
+            openSat.SignAC = txtSignAC.Text;
         }
 
         private void txtMFeEnvio_TextChanged(object sender, EventArgs e)
         {
-            acbrIntegrador.Configuracoes.PastaInput = txtMFeEnvio.Text;
+            openIntegrador.Configuracoes.PastaInput = txtMFeEnvio.Text;
         }
 
         private void txtMFeResposta_TextChanged(object sender, EventArgs e)
         {
-            acbrIntegrador.Configuracoes.PastaOutput = txtMFeResposta.Text;
+            openIntegrador.Configuracoes.PastaOutput = txtMFeResposta.Text;
         }
 
         private void nunMFeTimeout_ValueChanged(object sender, EventArgs e)
         {
-            acbrIntegrador.Configuracoes.TimeOut = (int)nunMFeTimeout.Value;
+            openIntegrador.Configuracoes.TimeOut = (int)nunMFeTimeout.Value;
         }
 
         private void txtChaveAcessoValidador_TextChanged(object sender, EventArgs e)
         {
-            acbrIntegrador.Configuracoes.ChaveAcessoValidador = txtChaveAcessoValidador.Text;
+            openIntegrador.Configuracoes.ChaveAcessoValidador = txtChaveAcessoValidador.Text;
         }
 
         private void chkPreview_CheckedChanged(object sender, EventArgs e)
@@ -747,7 +913,7 @@ namespace OpenAC.Net.Sat.Demo
 
         private void cmbFiltro_SelectedIndexChanged(object sender, EventArgs e)
         {
-            extrato.Filtro = (FiltroDFeReport)cmbFiltro.SelectedItem;
+            extrato.Filtro = cmbFiltro.GetSelectedValue<FiltroDFeReport>();
 
             txtExportacao.Enabled = extrato.Filtro != FiltroDFeReport.Nenhum;
             btnExportacao.Enabled = extrato.Filtro != FiltroDFeReport.Nenhum;
@@ -756,6 +922,19 @@ namespace OpenAC.Net.Sat.Demo
         private void txtExportacao_TextChanged(object sender, EventArgs e)
         {
             extrato.NomeArquivo = txtExportacao.Text;
+        }
+
+        private void cbbConexao_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var tipo = cbbConexao.GetSelectedValue<TipoConexao>();
+            tbcDeviceConfig.SelectedTab = tipo switch
+            {
+                TipoConexao.Serial => tbpSerial,
+                TipoConexao.TCP => tbpTCP,
+                TipoConexao.RAW => tbpRAW,
+                TipoConexao.File => tbpFile,
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
 
         #endregion ValueChanged
@@ -786,9 +965,9 @@ namespace OpenAC.Net.Sat.Demo
 
         private void btnEnviarPagamento_Click(object sender, EventArgs e)
         {
-            var _chaveRequisicao = Guid.NewGuid().ToString();
-            var resposta = acbrIntegrador.EnviarPagamento(
-                chaveRequisicao: _chaveRequisicao,
+            var chaveRequisicao = Guid.NewGuid().ToString();
+            var resposta = openIntegrador.EnviarPagamento(
+                chaveRequisicao: chaveRequisicao,
                 estabelecimento: "10",
                 serialPOS: new Random().Next(10000000, 99999999).ToString(),
                 cnpj: txtEmitCNPJ.Text,
@@ -806,9 +985,9 @@ namespace OpenAC.Net.Sat.Demo
 
         private void btnEnviarStatusPagamento_Click(object sender, EventArgs e)
         {
-            var _idfila = "00000000";
-            InputBox.Show("ID da fila", "Informe o if da fila", ref _idfila);
-            var resposta = acbrIntegrador.EnviarStatusPagamento(
+            var idfila = "00000000";
+            InputBox.Show("ID da fila", "Informe o if da fila", ref idfila);
+            var resposta = openIntegrador.EnviarStatusPagamento(
                 codigoAutorizacao: "20551",
                 bin: "123456",
                 donoCartao: "Teste",
@@ -817,7 +996,7 @@ namespace OpenAC.Net.Sat.Demo
                 parcelas: 1,
                 codigoPagamento: "12846",
                 valorPagamento: 1530,
-                idFila: int.Parse(_idfila),
+                idFila: int.Parse(idfila),
                 tipo: "1",
                 ultimosQuatroDigitos: 1234
              );
@@ -827,10 +1006,10 @@ namespace OpenAC.Net.Sat.Demo
 
         private void btnVerificarStatusValidador_Click(object sender, EventArgs e)
         {
-            var _idfila = "00000000";
-            InputBox.Show("ID da fila", "Informe o if da fila", ref _idfila);
-            var resposta = acbrIntegrador.VerificarStatusValidador(
-                idFila: int.Parse(_idfila),
+            var idfila = "00000000";
+            InputBox.Show("ID da fila", "Informe o if da fila", ref idfila);
+            var resposta = openIntegrador.VerificarStatusValidador(
+                idFila: int.Parse(idfila),
                 cnpj: txtEmitCNPJ.Text
             );
 
@@ -839,21 +1018,21 @@ namespace OpenAC.Net.Sat.Demo
 
         private void btnRespostaFiscal_Click(object sender, EventArgs e)
         {
-            var _idfila = "00000000";
-            InputBox.Show("ID da fila", "Id da fila", ref _idfila);
+            var idfila = "00000000";
+            InputBox.Show("ID da fila", "Id da fila", ref idfila);
 
-            var _chaveAcesso = "35170408723218000186599000113100000279731880";
-            InputBox.Show("Chave de acesso", "Chave de acesso do CFe", ref _chaveAcesso);
+            var chaveAcesso = "35170408723218000186599000113100000279731880";
+            InputBox.Show("Chave de acesso", "Chave de acesso do CFe", ref chaveAcesso);
 
-            var resposta = acbrIntegrador.RespostaFiscal(
-                idFila: int.Parse(_idfila),
-                chaveAcesso: _chaveAcesso,
-                nsu: _idfila.ToString(),
+            var resposta = openIntegrador.RespostaFiscal(
+                idFila: int.Parse(idfila),
+                chaveAcesso: chaveAcesso,
+                nsu: idfila.ToString(),
                 numeroAprovacao: "1234",
                 bandeira: "VISA",
                 adquirinte: "STONE",
                 impressaofiscal: "",
-                numeroDocumento: _idfila.ToString(),
+                numeroDocumento: idfila.ToString(),
                 cnpj: txtEmitCNPJ.Text
             );
 

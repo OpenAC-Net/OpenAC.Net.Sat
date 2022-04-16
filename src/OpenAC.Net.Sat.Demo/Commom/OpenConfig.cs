@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-namespace OpenAC.Net.Sat.Demo
+namespace OpenAC.Net.Sat.Demo.Commom
 {
     public class OpenConfig
     {

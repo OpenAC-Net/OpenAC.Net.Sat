@@ -12,9 +12,12 @@
     <PackageReference Include="OpenAC.Net.Core" Version="1.5.0-preview.2" />
     <PackageReference Include="OpenAC.Net.DFe.Core" Version="1.5.0-preview.3" />
     <PackageReference Include="OpenAC.Net.Integrador" Version="1.5.0-preview.3" />
+    <PackageReference Include="OpenAC.Net.Devices" Version="1.5.0-preview.4" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OpenAC.Net.Sat.Extrato.EscPos\OpenAC.Net.Sat.Extrato.EscPos.csproj" />
     <ProjectReference Include="..\OpenAC.Net.Sat.Extrato.FastReport.OpenSource\OpenAC.Net.Sat.Extrato.FastReport.OpenSource.csproj" />
     <ProjectReference Include="..\OpenAC.Net.Sat\OpenAC.Net.Sat.csproj" />
   </ItemGroup>

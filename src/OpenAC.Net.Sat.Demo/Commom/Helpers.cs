@@ -4,7 +4,7 @@ using System.IO;
 using System.Windows.Forms;
 using OpenAC.Net.Core.Extensions;
 
-namespace OpenAC.Net.Sat.Demo
+namespace OpenAC.Net.Sat.Demo.Commom
 {
     public static class Helpers
     {
