@@ -274,10 +274,11 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                     {
                         Printer.ImprimirTexto("Observações do Fisco", CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
 
-                        foreach (var txt in cfe.InfCFe.InfAdic.ObsFisco.Select(fisco => $"{fisco.XCampo} - {fisco.XTexto}").SelectMany(texto => texto.WrapText(Printer.Colunas)))
-                        {
+                        var observacoes = cfe.InfCFe.InfAdic.ObsFisco
+                            .Select(fisco => $"{fisco.XCampo} - {fisco.XTexto}")
+                            .SelectMany(texto => texto.WrapText(Printer.ColunasCondensada));
+                        foreach (var txt in observacoes)
                             Printer.ImprimirTexto(txt, CmdTamanhoFonte.Condensada);
-                        }
 
                         Printer.PularLinhas(1);
                     }
@@ -289,7 +290,7 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                     Printer.ImprimirTexto("Observações do Contribuinte", CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
 
                     if (!cfe.InfCFe.InfAdic.InfCpl.IsNull())
-                        foreach (var txt in cfe.InfCFe.InfAdic.InfCpl.WrapText(Printer.Colunas))
+                        foreach (var txt in cfe.InfCFe.InfAdic.InfCpl.WrapText(Printer.ColunasCondensada))
                             Printer.ImprimirTexto(txt, CmdTamanhoFonte.Condensada);
 
                     Printer.PularLinhas(1);
@@ -420,9 +421,9 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     #endregion Totais
 
-                    Printer.PularLinhas(1);
-
                     #region Pagamentos
+
+                    Printer.PularLinhas(1);
 
                     foreach (var pagto in cfe.InfCFe.Pagto.Pagamentos)
                         Printer.ImprimirTexto(
@@ -455,10 +456,11 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                     {
                         Printer.ImprimirTexto("Observações do Fisco", CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
 
-                        foreach (var txt in cfe.InfCFe.InfAdic.ObsFisco.Select(fisco => $"{fisco.XCampo} - {fisco.XTexto}").SelectMany(texto => texto.WrapText(Printer.Colunas)))
-                        {
+                        var observacoes = cfe.InfCFe.InfAdic.ObsFisco
+                                                    .Select(fisco => $"{fisco.XCampo} - {fisco.XTexto}")
+                                                    .SelectMany(texto => texto.WrapText(Printer.ColunasCondensada));
+                        foreach (var txt in observacoes)
                             Printer.ImprimirTexto(txt, CmdTamanhoFonte.Condensada);
-                        }
 
                         Printer.PularLinhas(1);
                     }
@@ -470,7 +472,7 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                     Printer.ImprimirTexto("Observações do Contribuinte", CmdTamanhoFonte.Condensada, CmdEstiloFonte.Negrito);
 
                     if (!cfe.InfCFe.InfAdic.InfCpl.IsNull())
-                        foreach (var txt in cfe.InfCFe.InfAdic.InfCpl.WrapText(Printer.Colunas))
+                        foreach (var txt in cfe.InfCFe.InfAdic.InfCpl.WrapText(Printer.ColunasCondensada))
                             Printer.ImprimirTexto(txt, CmdTamanhoFonte.Condensada);
 
                     Printer.PularLinhas(1);
@@ -685,10 +687,10 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                     #region QrCode
 
                     var qrCodeCancelado2 = $"{cFeCanc.InfCFe.Id.OnlyNumbers()}|" +
-                                        $"{cFeCanc.InfCFe.Ide.DhEmissao:yyyyMMddHHmmss}|" +
-                                        $"{cFeCanc.InfCFe.Total.VCFe:0.00}|" +
-                                        $"{(cFeCanc.InfCFe.Dest?.CNPJ.IsEmpty() == false ? cFeCanc.InfCFe.Dest.CNPJ : cFeCanc.InfCFe.Dest.CPF)}|" +
-                                        $"{cFeCanc.InfCFe.Ide.AssinaturaQrcode}";
+                                           $"{cFeCanc.InfCFe.Ide.DhEmissao:yyyyMMddHHmmss}|" +
+                                           $"{cFeCanc.InfCFe.Total.VCFe:0.00}|" +
+                                           $"{(cFeCanc.InfCFe.Dest?.CNPJ.IsEmpty() == false ? cFeCanc.InfCFe.Dest.CNPJ : cFeCanc.InfCFe.Dest.CPF)}|" +
+                                           $"{cFeCanc.InfCFe.Ide.AssinaturaQrcode}";
 
                     Printer.ImprimirQrCode(qrCodeCancelado2, aAlinhamento: centralizado, tamanho: Printer.Colunas >= 48 ? QrCodeModSize.Normal : QrCodeModSize.Pequeno);
 
