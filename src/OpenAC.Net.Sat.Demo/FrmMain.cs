@@ -278,13 +278,13 @@ namespace OpenAC.Net.Sat.Demo
                 pctLogo.Image?.Dispose();
                 pctLogo.Image = null;
 
-                extrato.Logo = null;
+                extrato.Configuracoes.Logo = null;
             }
             else
             {
                 var imgBytes = Convert.FromBase64String(img);
                 pctLogo.Image = imgBytes.ToImage();
-                extrato.Logo = pctLogo.Image;
+                extrato.Configuracoes.Logo = pctLogo.Image;
             }
 
             chkPreview.Checked = config.Get("ExtratoPreview", false);
@@ -564,10 +564,10 @@ namespace OpenAC.Net.Sat.Demo
             switch (tipo)
             {
                 case TipoExtrato.FastReport:
-                    if (extrato.Filtro != FiltroDFeReport.Nenhum && extrato.NomeArquivo.IsEmpty()) return;
+                    if (extrato.Configuracoes.Filtro != FiltroDFeReport.Nenhum && extrato.Configuracoes.NomeArquivo.IsEmpty()) return;
                     extrato.ImprimirExtrato(cfeAtual);
 
-                    if (extrato.Filtro == FiltroDFeReport.Nenhum) return;
+                    if (extrato.Configuracoes.Filtro == FiltroDFeReport.Nenhum) return;
                     MessageBox.Show(this, @"Extrato impresso com sucesso !", @"S@T Demo");
                     break;
 
@@ -575,7 +575,7 @@ namespace OpenAC.Net.Sat.Demo
                     using (var posprinter = GetPosPrinter())
                     {
                         if (pctLogo.Image != null)
-                            escpos.Logo = pctLogo.Image.ResizeImage(300, 300);
+                            escpos.Configuracoes.Logo = pctLogo.Image.ResizeImage(300, 300);
                         escpos.Printer = posprinter;
                         escpos.ImprimirExtrato(cfeAtual);
                     }
@@ -589,11 +589,11 @@ namespace OpenAC.Net.Sat.Demo
         private void imprimirExtratoVendaResumidoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (cfeAtual.IsNull()) return;
-            if (extrato.Filtro != FiltroDFeReport.Nenhum && extrato.NomeArquivo.IsEmpty()) return; ;
+            if (extrato.Configuracoes.Filtro != FiltroDFeReport.Nenhum && extrato.Configuracoes.NomeArquivo.IsEmpty()) return; ;
 
             extrato.ImprimirExtratoResumido(cfeAtual);
 
-            if (extrato.Filtro == FiltroDFeReport.Nenhum) return;
+            if (extrato.Configuracoes.Filtro == FiltroDFeReport.Nenhum) return;
             MessageBox.Show(this, @"Extrato impresso com sucesso !", @"S@T Demo");
         }
 
@@ -898,30 +898,30 @@ namespace OpenAC.Net.Sat.Demo
 
         private void chkPreview_CheckedChanged(object sender, EventArgs e)
         {
-            extrato.MostrarPreview = chkPreview.Checked;
+            extrato.Configuracoes.MostrarPreview = chkPreview.Checked;
         }
 
         private void chkSetup_CheckedChanged(object sender, EventArgs e)
         {
-            extrato.MostrarSetup = chkSetup.Checked;
+            extrato.Configuracoes.MostrarSetup = chkSetup.Checked;
         }
 
         private void nudEspacoFinal_ValueChanged(object sender, EventArgs e)
         {
-            extrato.EspacoFinal = nudEspacoFinal.Value;
+            extrato.Configuracoes.EspacoFinal = nudEspacoFinal.Value;
         }
 
         private void cmbFiltro_SelectedIndexChanged(object sender, EventArgs e)
         {
-            extrato.Filtro = cmbFiltro.GetSelectedValue<FiltroDFeReport>();
+            extrato.Configuracoes.Filtro = cmbFiltro.GetSelectedValue<FiltroDFeReport>();
 
-            txtExportacao.Enabled = extrato.Filtro != FiltroDFeReport.Nenhum;
-            btnExportacao.Enabled = extrato.Filtro != FiltroDFeReport.Nenhum;
+            txtExportacao.Enabled = extrato.Configuracoes.Filtro != FiltroDFeReport.Nenhum;
+            btnExportacao.Enabled = extrato.Configuracoes.Filtro != FiltroDFeReport.Nenhum;
         }
 
         private void txtExportacao_TextChanged(object sender, EventArgs e)
         {
-            extrato.NomeArquivo = txtExportacao.Text;
+            extrato.Configuracoes.NomeArquivo = txtExportacao.Text;
         }
 
         private void cbbConexao_SelectedIndexChanged(object sender, EventArgs e)
@@ -1046,19 +1046,19 @@ namespace OpenAC.Net.Sat.Demo
 
             var img = Image.FromFile(file);
             pctLogo.Image = img;
-            extrato.Logo = img;
+            extrato.Configuracoes.Logo = img;
         }
 
         private void limparLogoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             pctLogo.Image?.Dispose();
             pctLogo.Image = null;
-            extrato.Logo = null;
+            extrato.Configuracoes.Logo = null;
         }
 
         private void btnExportacao_Click(object sender, EventArgs e)
         {
-            var extensao = extrato.Filtro == FiltroDFeReport.HTML ? ".html" : ".pdf";
+            var extensao = extrato.Configuracoes.Filtro == FiltroDFeReport.HTML ? ".html" : ".pdf";
             var file = Helpers.SaveFile($"ExtratoSat", $"Extrato Sat (*{extensao}) | *{extensao}");
             txtExportacao.Text = file;
         }

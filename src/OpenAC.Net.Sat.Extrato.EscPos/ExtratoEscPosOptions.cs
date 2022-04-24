@@ -1,4 +1,4 @@
-// ***********************************************************************
+﻿// ***********************************************************************
 // Assembly         : OpenAC.Net.Sat
 // Author           : RFTD
 // Created          : 03-31-2016
@@ -6,7 +6,7 @@
 // Last Modified By : RFTD
 // Last Modified On : 02-16-2017
 // ***********************************************************************
-// <copyright file="ExtratoSat.cs" company="OpenAC .Net">
+// <copyright file="ExtratoEscPosOptions.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 // 		    Copyright (c) 2016 - 2022 Projeto OpenAC .Net
 //
@@ -29,48 +29,24 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System;
-using System.Globalization;
-using OpenAC.Net.Core.Extensions;
 using OpenAC.Net.DFe.Core.Common;
 
-namespace OpenAC.Net.Sat
+namespace OpenAC.Net.Sat.Extrato.EscPos
 {
-    public abstract class ExtratoSat<TOptions> : ExtratoSat where TOptions : DFeOptionsBase
+    public sealed class ExtratoEscPosOptions : DFeOptionsBase
     {
         #region Properties
 
-        public new TOptions Configuracoes
-        {
-            get => (TOptions)base.Configuracoes;
-            protected set => base.Configuracoes = value;
-        }
+        public bool DescricaoUmaLinha { get; set; } = true;
+
+        public bool UsarBarrasComoCodigo { get; set; } = true;
+
+        public int CasasDecimaisQuantidade { get; set; } = 2;
+
+        public bool ImprimirDeOlhoNoImposto { get; set; } = true;
+
+        public bool CortarPapel { get; set; } = true;
 
         #endregion Properties
-    }
-
-    public abstract class ExtratoSat
-    {
-        #region Properties
-
-        public DFeOptionsBase Configuracoes { get; protected set; }
-
-        #endregion Properties
-
-        #region Methods
-
-        public string CalcularConteudoQRCode(string id, DateTime dhEmissao, decimal valor, string cpfcnpj, string assinaturaQrcode)
-        {
-            return $"{id}|{dhEmissao:yyyyMMddHHmmss}|{valor.ToString(CultureInfo.InvariantCulture)}" +
-                   $"|{cpfcnpj.OnlyNumbers()}|{assinaturaQrcode}";
-        }
-
-        public abstract void ImprimirExtrato(CFe cfe);
-
-        public abstract void ImprimirExtratoResumido(CFe cfe);
-
-        public abstract void ImprimirExtratoCancelamento(CFe cfe, CFeCanc cFeCanc);
-
-        #endregion Methods
     }
 }

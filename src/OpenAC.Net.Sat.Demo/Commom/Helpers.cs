@@ -59,21 +59,5 @@ namespace OpenAC.Net.Sat.Demo.Commom
             var imgBytes = imageIn.ToByteArray(format);
             return imgBytes.ToBase64();
         }
-
-        /// <summary>
-        /// To the image.
-        /// </summary>
-        /// <param name="byteArrayIn">The byte array in.</param>
-        /// <returns>Image.</returns>
-        public static Image ToImage(this byte[] byteArrayIn)
-        {
-            if (byteArrayIn == null) return null;
-
-            using (var ms = new MemoryStream(byteArrayIn))
-            {
-                var returnImage = Image.FromStream(ms);
-                return returnImage;
-            }
-        }
     }
 }

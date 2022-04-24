@@ -8,7 +8,7 @@
 // ***********************************************************************
 // <copyright file="ExtratoFastReport.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2014 - 2021 Projeto OpenAC .Net
+//	     		    Copyright (c) 2014 - 2022 Projeto OpenAC .Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -39,7 +39,7 @@ using OpenAC.Net.DFe.Core.Common;
 
 namespace OpenAC.Net.Sat.Extrato.FastReport
 {
-    public sealed class ExtratoFastReport : ExtratoSat
+    public sealed class ExtratoFastReport : ExtratoSat<ExtratoFastReportOptions>
     {
         #region Fields
 
@@ -53,15 +53,14 @@ namespace OpenAC.Net.Sat.Extrato.FastReport
 
         #endregion Events
 
-        #region Propriedades
+        #region Constructors
 
-        public bool DescricaoUmaLinha { get; set; }
+        public ExtratoFastReport()
+        {
+            Configuracoes = new ExtratoFastReportOptions();
+        }
 
-        public decimal EspacoFinal { get; set; }
-
-        public bool ShowDesign { get; set; }
-
-        #endregion Propriedades
+        #endregion Constructors
 
         #region Methods
 
@@ -91,48 +90,45 @@ namespace OpenAC.Net.Sat.Extrato.FastReport
         {
             internalReport.Prepare();
 
-            if (ShowDesign)
+            switch (Configuracoes.Filtro)
             {
-                internalReport.Design();
-            }
-            else
-            {
-                switch (Filtro)
-                {
-                    case FiltroDFeReport.Nenhum:
-                        if (MostrarPreview)
-                            internalReport.Show();
-                        else
-                            internalReport.Print();
-                        break;
+                case FiltroExtrato.Nenhum:
+                    if (Configuracoes.MostrarPreview)
+                        internalReport.Show();
+                    else
+                        internalReport.Print();
+                    break;
 
-                    case FiltroDFeReport.PDF:
-                        var pdfExport = new PDFExport
-                        {
-                            EmbeddingFonts = true,
-                            ShowProgress = MostrarSetup,
-                            PdfCompliance = PDFExport.PdfStandard.PdfA_3b,
-                            OpenAfterExport = MostrarPreview
-                        };
+                case FiltroExtrato.PDF:
+                    var pdfExport = new PDFExport
+                    {
+                        EmbeddingFonts = true,
+                        ShowProgress = Configuracoes.MostrarSetup,
+                        PdfCompliance = PDFExport.PdfStandard.PdfA_3b,
+                        OpenAfterExport = Configuracoes.MostrarPreview
+                    };
 
-                        internalReport.Export(pdfExport, NomeArquivo);
-                        break;
+                    internalReport.Export(pdfExport, Configuracoes.NomeArquivo);
+                    break;
 
-                    case FiltroDFeReport.HTML:
-                        var htmlExport = new HTMLExport
-                        {
-                            Format = HTMLExportFormat.MessageHTML,
-                            EmbedPictures = true,
-                            Preview = MostrarPreview,
-                            ShowProgress = MostrarSetup
-                        };
+                case FiltroExtrato.HTML:
+                    var htmlExport = new HTMLExport
+                    {
+                        Format = HTMLExportFormat.MessageHTML,
+                        EmbedPictures = true,
+                        Preview = Configuracoes.MostrarPreview,
+                        ShowProgress = Configuracoes.MostrarSetup
+                    };
 
-                        internalReport.Export(htmlExport, NomeArquivo);
-                        break;
+                    internalReport.Export(htmlExport, Configuracoes.NomeArquivo);
+                    break;
 
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                case FiltroExtrato.Design:
+                    internalReport.Design();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             internalReport.Dispose();
@@ -170,15 +166,15 @@ namespace OpenAC.Net.Sat.Extrato.FastReport
                 internalReport.Load(e.FilePath);
             }
 
-            internalReport.SetParameterValue("Logo", Logo);
+            internalReport.SetParameterValue("Logo", Configuracoes.Logo);
             internalReport.SetParameterValue("IsResumido", tipo == ExtratoLayOut.Resumido);
-            internalReport.SetParameterValue("IsOneLine", DescricaoUmaLinha);
-            internalReport.SetParameterValue("EspacoFinal", EspacoFinal);
+            internalReport.SetParameterValue("IsOneLine", Configuracoes.DescricaoUmaLinha);
+            internalReport.SetParameterValue("EspacoFinal", Configuracoes.EspacoFinal);
             internalReport.SetParameterValue("Ambiente", ambiente);
 
-            internalReport.PrintSettings.Copies = NumeroCopias;
-            internalReport.PrintSettings.Printer = Impressora;
-            internalReport.PrintSettings.ShowDialog = MostrarSetup;
+            internalReport.PrintSettings.Copies = Configuracoes.NumeroCopias;
+            internalReport.PrintSettings.Printer = Configuracoes.Impressora;
+            internalReport.PrintSettings.ShowDialog = Configuracoes.MostrarSetup;
         }
 
         #endregion Methods

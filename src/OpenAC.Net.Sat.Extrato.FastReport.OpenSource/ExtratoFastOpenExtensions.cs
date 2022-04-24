@@ -36,24 +36,24 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 {
     public static class ExtratoFastOpenExtensions
     {
-        public static void ImprimirExtrato(this OpenSat sat, CFe cfe, Action<ExtratoFastOpen> options = null)
+        public static void ImprimirExtrato(this OpenSat sat, CFe cfe, Action<ExtratoFastOpentOptions> options = null)
         {
             var extrato = new ExtratoFastOpen();
-            options?.Invoke(extrato);
+            options?.Invoke(extrato.Configuracoes);
             extrato.ImprimirExtrato(cfe);
         }
 
-        public static void ImprimirExtratoCancelamento(this OpenSat sat, CFe cfe, CFeCanc cFeCanc, Action<ExtratoFastOpen> options = null)
+        public static void ImprimirExtratoCancelamento(this OpenSat sat, CFe cfe, CFeCanc cFeCanc, Action<ExtratoFastOpentOptions> options = null)
         {
             var extrato = new ExtratoFastOpen();
-            options?.Invoke(extrato);
+            options?.Invoke(extrato.Configuracoes);
             extrato.ImprimirExtratoCancelamento(cfe, cFeCanc);
         }
 
-        public static void ImprimirExtratoResumido(this OpenSat sat, CFe cfe, Action<ExtratoFastOpen> options = null)
+        public static void ImprimirExtratoResumido(this OpenSat sat, CFe cfe, Action<ExtratoFastOpentOptions> options = null)
         {
             var extrato = new ExtratoFastOpen();
-            options?.Invoke(extrato);
+            options?.Invoke(extrato.Configuracoes);
             extrato.ImprimirExtratoResumido(cfe);
         }
     }

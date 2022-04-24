@@ -29,7 +29,10 @@
 // <summary></summary>
 // ***********************************************************************
 
+using System;
+using System.Runtime.ExceptionServices;
 using System.Text;
+using OpenAC.Net.Core;
 using OpenAC.Net.Core.InteropServices;
 using OpenAC.Net.Sat.Interfaces;
 

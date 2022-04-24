@@ -40,22 +40,26 @@ using OpenAC.Net.EscPos.Commom;
 
 namespace OpenAC.Net.Sat.Extrato.EscPos
 {
-    public sealed class ExtratoEscPos : ExtratoSat
+    public sealed class ExtratoEscPos : ExtratoSat<ExtratoEscPosOptions>
     {
         #region Events
 
         public EventHandler<EspPosprintEventArgs> GetPrinter;
-        private EscPosPrinter printer;
 
         #endregion Events
 
-        #region Properties
+        #region Fields
 
-        public new FiltroDFeReport Filtro
+        private EscPosPrinter printer;
+
+        #endregion Fields
+
+        public ExtratoEscPos()
         {
-            get => FiltroDFeReport.Nenhum;
-            set => throw new NotSupportedException("Filtro não é suportado no extrato EscPos");
+            Configuracoes = new ExtratoEscPosOptions();
         }
+
+        #region Properties
 
         public EscPosPrinter Printer
         {
@@ -71,16 +75,6 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
             }
             set => printer = value;
         }
-
-        public bool DescricaoUmaLinha { get; set; } = true;
-
-        public bool UsarBarrasComoCodigo { get; set; } = true;
-
-        public int CasasDecimaisQuantidade { get; set; } = 2;
-
-        public bool ImprimirDeOlhoNoImposto { get; set; } = true;
-
-        public bool CortarPapel { get; set; } = true;
 
         #endregion Properties
 
@@ -105,8 +99,8 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
             #region Logotipo
 
-            if (Logo != null)
-                Printer.ImprimirImagem(Logo, centralizado);
+            if (Configuracoes.Logo != null)
+                Printer.ImprimirImagem(Configuracoes.Logo, centralizado);
 
             #endregion Logotipo
 
@@ -182,18 +176,18 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                     foreach (var det in cfe.InfCFe.Det)
                     {
                         var codProd =
-                            $"{(UsarBarrasComoCodigo && det.Prod.CEAN.IsEmpty() ? det.Prod.CEAN : det.Prod.CProd),-13}";
-                        var textoE = DescricaoUmaLinha
+                            $"{(Configuracoes.UsarBarrasComoCodigo && det.Prod.CEAN.IsEmpty() ? det.Prod.CEAN : det.Prod.CProd),-13}";
+                        var textoE = Configuracoes.DescricaoUmaLinha
                             ? $"{det.NItem:D3} | {codProd} {det.Prod.XProd}"
                             : $"{det.NItem:D3} | {codProd}";
 
                         var textoR =
-                            $"{det.Prod.QCom.ToString($"N{CasasDecimaisQuantidade}")} {det.Prod.UCom} x {det.Prod.VUnCom:N2} = {det.Prod.VItem:N2}";
+                            $"{det.Prod.QCom.ToString($"N{Configuracoes.CasasDecimaisQuantidade}")} {det.Prod.UCom} x {det.Prod.VUnCom:N2} = {det.Prod.VItem:N2}";
 
                         Printer.ImprimirTexto(AjustarTextoColunas(textoE, textoR, Printer.ColunasCondensada),
                             CmdTamanhoFonte.Condensada);
 
-                        if (!DescricaoUmaLinha)
+                        if (!Configuracoes.DescricaoUmaLinha)
                             Printer.ImprimirTexto(det.Prod.XProd.LimitarString(Printer.ColunasCondensada),
                                 CmdTamanhoFonte.Condensada);
 
@@ -299,7 +293,7 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     #region Tributos
 
-                    if (ImprimirDeOlhoNoImposto)
+                    if (Configuracoes.ImprimirDeOlhoNoImposto)
                     {
                         Printer.ImprimirTexto(AjustarTextoColunas("Valor aproximado dos Tributos deste Cupom", cfe.InfCFe.Total.VCFeLei12741.ToString("C2", cultura), Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
                         Printer.ImprimirTexto("(Conforme Lei Fed. 12.741/2012)", CmdTamanhoFonte.Condensada);
@@ -481,7 +475,7 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     #region Tributos
 
-                    if (ImprimirDeOlhoNoImposto)
+                    if (Configuracoes.ImprimirDeOlhoNoImposto)
                     {
                         Printer.ImprimirTexto(AjustarTextoColunas("Valor aproximado dos Tributos deste Cupom", cfe.InfCFe.Total.VCFeLei12741.ToString("C2", cultura), Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
                         Printer.ImprimirTexto("(Conforme Lei Fed. 12.741/2012)", CmdTamanhoFonte.Condensada);
@@ -708,18 +702,18 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
             #region Desenvolvedor
 
-            if (!SoftwareHouse.IsEmpty())
+            if (!Configuracoes.SoftwareHouse.IsEmpty())
             {
-                Printer.ImprimirTexto(SoftwareHouse, Printer.Colunas >= 48 ? CmdAlinhamento.Direita : CmdAlinhamento.Esquerda);
+                Printer.ImprimirTexto(Configuracoes.SoftwareHouse, Printer.Colunas >= 48 ? CmdAlinhamento.Direita : CmdAlinhamento.Esquerda);
                 Printer.PularLinhas(1);
             }
 
             #endregion Desenvolvedor
 
-            if (CortarPapel)
+            if (Configuracoes.CortarPapel)
                 Printer.CortarPapel(true);
 
-            Printer.Imprimir(NumeroCopias);
+            Printer.Imprimir(Configuracoes.NumeroCopias);
         }
 
         private static string AjustarTextoColunas(string textoE, string textoR, int colunas)

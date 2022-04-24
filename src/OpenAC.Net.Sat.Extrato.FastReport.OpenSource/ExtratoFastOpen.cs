@@ -43,7 +43,7 @@ using OpenAC.Net.DFe.Core.Common;
 
 namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 {
-    public sealed class ExtratoFastOpen : ExtratoSat
+    public sealed class ExtratoFastOpen : ExtratoSat<ExtratoFastOpentOptions>
     {
         #region Fields
 
@@ -52,19 +52,20 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
 
         #endregion Fields
 
+        #region Constructors
+
+        public ExtratoFastOpen()
+        {
+            Configuracoes = new ExtratoFastOpentOptions();
+        }
+
+        #endregion Constructors
+
         #region Events
 
         public event EventHandler<ExtratoEventArgs> OnGetExtrato;
 
         #endregion Events
-
-        #region Properties
-
-        public bool DescricaoUmaLinha { get; set; }
-
-        public decimal EspacoFinal { get; set; }
-
-        #endregion Properties
 
         #region Methods
 
@@ -94,12 +95,12 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
         {
             internalReport.Prepare();
 
-            switch (Filtro)
+            switch (Configuracoes.Filtro)
             {
                 case FiltroDFeReport.Nenhum:
-                    if (MostrarPreview)
+                    if (Configuracoes.MostrarPreview)
                         internalReport.Show();
-                    else if (MostrarSetup)
+                    else if (Configuracoes.MostrarSetup)
                         internalReport.PrintWithDialog();
                     else
                         internalReport.Print(settings);
@@ -108,11 +109,11 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
                 case FiltroDFeReport.PDF:
                     var pdfExport = new PDFSimpleExport()
                     {
-                        ShowProgress = MostrarSetup,
-                        OpenAfterExport = MostrarPreview
+                        ShowProgress = Configuracoes.MostrarSetup,
+                        OpenAfterExport = Configuracoes.MostrarPreview
                     };
 
-                    internalReport.Export(pdfExport, NomeArquivo);
+                    internalReport.Export(pdfExport, Configuracoes.NomeArquivo);
                     break;
 
                 case FiltroDFeReport.HTML:
@@ -120,11 +121,11 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
                     {
                         Format = HTMLExportFormat.MessageHTML,
                         EmbedPictures = true,
-                        Preview = MostrarPreview,
-                        ShowProgress = MostrarSetup
+                        Preview = Configuracoes.MostrarPreview,
+                        ShowProgress = Configuracoes.MostrarSetup
                     };
 
-                    internalReport.Export(htmlExport, NomeArquivo);
+                    internalReport.Export(htmlExport, Configuracoes.NomeArquivo);
                     break;
 
                 default:
@@ -170,16 +171,16 @@ namespace OpenAC.Net.Sat.Extrato.FastReport.OpenSource
                 internalReport.Load(e.FilePath);
             }
 
-            internalReport.SetParameterValue("Logo", Logo);
+            internalReport.SetParameterValue("Logo", Configuracoes.Logo);
             internalReport.SetParameterValue("IsResumido", tipo == ExtratoLayOut.Resumido);
-            internalReport.SetParameterValue("IsOneLine", DescricaoUmaLinha);
-            internalReport.SetParameterValue("EspacoFinal", EspacoFinal);
+            internalReport.SetParameterValue("IsOneLine", Configuracoes.DescricaoUmaLinha);
+            internalReport.SetParameterValue("EspacoFinal", Configuracoes.EspacoFinal);
             internalReport.SetParameterValue("Ambiente", ambiente);
 
-            settings = new PrinterSettings { Copies = (short)Math.Max(NumeroCopias, 1) };
+            settings = new PrinterSettings { Copies = (short)Math.Max(Configuracoes.NumeroCopias, 1) };
 
-            if (!Impressora.IsEmpty())
-                settings.PrinterName = Impressora;
+            if (!Configuracoes.Impressora.IsEmpty())
+                settings.PrinterName = Configuracoes.Impressora;
         }
 
         #endregion Methods
