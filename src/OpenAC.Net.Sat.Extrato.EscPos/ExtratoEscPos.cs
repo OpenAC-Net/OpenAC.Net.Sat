@@ -106,7 +106,7 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
             #region Dados do Emitente
 
-            Printer.ImprimirTexto(!cfe.InfCFe.Emit.XFant.IsEmpty() ? cfe.InfCFe.Emit.XFant.FillRight(Printer.Colunas) :
+            Printer.ImprimirTexto(!cfe.InfCFe.Emit.XFant.IsEmpty() ? cfe.InfCFe.Emit.XFant.LimitarString(Printer.Colunas) :
                                                                      cfe.InfCFe.Emit.XNome.LimitarString(Printer.Colunas), centralizado, CmdEstiloFonte.Negrito);
 
             Printer.ImprimirTexto(cfe.InfCFe.Emit.XNome.LimitarString(Printer.Colunas));

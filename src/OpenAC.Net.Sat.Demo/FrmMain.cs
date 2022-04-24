@@ -589,12 +589,30 @@ namespace OpenAC.Net.Sat.Demo
         private void imprimirExtratoVendaResumidoToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (cfeAtual.IsNull()) return;
-            if (extrato.Configuracoes.Filtro != FiltroDFeReport.Nenhum && extrato.Configuracoes.NomeArquivo.IsEmpty()) return; ;
+            var tipo = cmbExtrato.GetSelectedValue<TipoExtrato>();
+            switch (tipo)
+            {
+                case TipoExtrato.FastReport:
+                    if (extrato.Configuracoes.Filtro != FiltroDFeReport.Nenhum && extrato.Configuracoes.NomeArquivo.IsEmpty()) return;
+                    extrato.ImprimirExtratoResumido(cfeAtual);
 
-            extrato.ImprimirExtratoResumido(cfeAtual);
+                    if (extrato.Configuracoes.Filtro == FiltroDFeReport.Nenhum) return;
+                    MessageBox.Show(this, @"Extrato impresso com sucesso !", @"S@T Demo");
+                    break;
 
-            if (extrato.Configuracoes.Filtro == FiltroDFeReport.Nenhum) return;
-            MessageBox.Show(this, @"Extrato impresso com sucesso !", @"S@T Demo");
+                case TipoExtrato.EscPos:
+                    using (var posprinter = GetPosPrinter())
+                    {
+                        if (pctLogo.Image != null)
+                            escpos.Configuracoes.Logo = pctLogo.Image.ResizeImage(300, 300);
+                        escpos.Printer = posprinter;
+                        escpos.ImprimirExtratoResumido(cfeAtual);
+                    }
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void carregarXMLToolStripMenuItem_Click(object sender, EventArgs e)
