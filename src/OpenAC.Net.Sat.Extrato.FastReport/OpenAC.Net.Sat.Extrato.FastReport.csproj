@@ -80,7 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FastReport.Net.Demo">
-      <Version>2022.2.7</Version>
+      <Version>2022.2.17</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.SourceLink.GitHub">
       <Version>1.1.1</Version>
@@ -91,7 +91,7 @@
       <Version>1.5.0.1</Version>
     </PackageReference>
     <PackageReference Include="OpenAC.Net.DFe.Core">
-      <Version>1.5.0</Version>
+      <Version>1.5.0.1</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

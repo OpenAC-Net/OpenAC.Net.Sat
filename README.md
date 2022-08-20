@@ -14,6 +14,11 @@ Biblioteca gratuita para Geração de SAT-CF-e 0.06, 0.07 e 0.08.
 A biblioteca foi desenvolvida com o Visual Studio Community 2019.
 Está licenciada sobre a MIT.
 
+## Stats
+=================
+
+![Alt](https://repobeats.axiom.co/api/embed/400ac6d6dcda99adb29e3751a84feea172a1dadb.svg "Repobeats analytics image")
+
 **Dependencias**
 
 O projeto tem dependencias de outras lib do projeto OpenAC .Net
