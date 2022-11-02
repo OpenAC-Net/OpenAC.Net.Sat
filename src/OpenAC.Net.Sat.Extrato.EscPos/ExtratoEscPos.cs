@@ -150,9 +150,10 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     #region Consumidor
 
-                    var cpfcnpj = cfe.InfCFe.Dest?.CPF.IsEmpty() == true ? cfe.InfCFe.Dest.CPF.FormataCPF() :
-                        cfe.InfCFe.Dest?.CNPJ.IsEmpty() == true ? cfe.InfCFe.Dest.CNPJ.FormataCNPJ() :
-                        "000.000.000-00";
+                    var cpfcnpj = cfe.InfCFe.Dest?.CPF.IsEmpty() == true && cfe.InfCFe.Dest?.CNPJ.IsEmpty() == true ? "000.000.000-00"
+                                 : cfe.InfCFe.Dest?.CPF.IsEmpty() == false
+                                 ? cfe.InfCFe.Dest.CPF.FormataCPF()
+                                 : cfe.InfCFe.Dest.CNPJ.FormataCNPJ();
 
                     Printer.ImprimirTexto($"CPF/CNPJ do Consumidor: {cpfcnpj}", CmdTamanhoFonte.Condensada);
                     Printer.ImprimirTexto($"Razão Social/Nome: {(cfe.InfCFe.Dest?.Nome ?? "CONSUMIDOR")}".LimitarString(Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
@@ -379,9 +380,10 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
 
                     #region Consumidor
 
-                    var cpofCnpjR = cfe.InfCFe.Dest?.CPF.IsEmpty() == true ? cfe.InfCFe.Dest.CPF.FormataCPF() :
-                        cfe.InfCFe.Dest?.CNPJ.IsEmpty() == true ? cfe.InfCFe.Dest.CNPJ.FormataCNPJ() :
-                        "000.000.000-00";
+                    var cpofCnpjR = cfe.InfCFe.Dest?.CPF.IsEmpty() == true && cfe.InfCFe.Dest?.CNPJ.IsEmpty() == true ? "000.000.000-00"
+                                : cfe.InfCFe.Dest?.CPF.IsEmpty() == false
+                                ? cfe.InfCFe.Dest.CPF.FormataCPF()
+                                : cfe.InfCFe.Dest.CNPJ.FormataCNPJ();
 
                     Printer.ImprimirTexto($"CPF/CNPJ do Consumidor: {cpofCnpjR}", CmdTamanhoFonte.Condensada);
                     Printer.ImprimirTexto($"Razão Social/Nome: {(cfe.InfCFe.Dest?.Nome ?? "CONSUMIDOR")}".LimitarString(Printer.ColunasCondensada), CmdTamanhoFonte.Condensada);
