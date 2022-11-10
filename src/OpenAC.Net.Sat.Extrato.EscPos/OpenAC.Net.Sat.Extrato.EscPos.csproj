@@ -18,9 +18,9 @@
 		<Description>Biblioteca para impressao do extrato do SAT/MFe em EscPos</Description>
 		<NeutralLanguage>pt-BR</NeutralLanguage>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
-		<AssemblyVersion>1.5.0.2</AssemblyVersion>
-		<FileVersion>1.5.0.2</FileVersion>
-		<Version>1.5.0.2</Version>
+		<AssemblyVersion>1.5.0.4</AssemblyVersion>
+		<FileVersion>1.5.0.4</FileVersion>
+		<Version>1.5.0.4</Version>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<DebugType>embedded</DebugType>

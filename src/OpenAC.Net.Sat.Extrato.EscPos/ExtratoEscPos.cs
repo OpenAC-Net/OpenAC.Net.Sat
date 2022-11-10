@@ -177,7 +177,7 @@ namespace OpenAC.Net.Sat.Extrato.EscPos
                     foreach (var det in cfe.InfCFe.Det)
                     {
                         var codProd =
-                            $"{(Configuracoes.UsarBarrasComoCodigo && det.Prod.CEAN.IsEmpty() ? det.Prod.CEAN : det.Prod.CProd),-13}";
+                            $"{(Configuracoes.UsarBarrasComoCodigo && !det.Prod.CEAN.IsEmpty() ? det.Prod.CEAN : det.Prod.CProd),-13}";
                         var textoE = Configuracoes.DescricaoUmaLinha
                             ? $"{det.NItem:D3} | {codProd} {det.Prod.XProd}"
                             : $"{det.NItem:D3} | {codProd}";
