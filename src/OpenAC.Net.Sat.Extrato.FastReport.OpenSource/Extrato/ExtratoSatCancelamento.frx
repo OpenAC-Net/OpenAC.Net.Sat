@@ -78,7 +78,7 @@
 		private void dbQrCode_BeforePrint(object sender, EventArgs e)
 		{
 		var documentoDest = &quot;&quot;;
-		var id =  (string)Report.GetColumnValue(&quot;CFe.InfCFe.ChCanc&quot;);
+		var id =  (string)Report.GetColumnValue(&quot;CFe.InfCFe.Id&quot;);
 		var cnpj = (string)Report.GetColumnValue(&quot;CFe.InfCFe.Dest.CNPJ&quot;);
 		var cpf = (string)Report.GetColumnValue(&quot;CFe.InfCFe.Dest.CPF&quot;);
 		var dtEmissao = (DateTime)Report.GetColumnValue(&quot;CFe.InfCFe.Ide.DhEmissao&quot;);
